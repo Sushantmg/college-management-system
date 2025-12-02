@@ -22,32 +22,36 @@ model User {
 }
 
 model Department {
-  id     String   @id @default(auto()) @map("_id") @db.ObjectId
-  name   String   @unique
-  headId String?  @db.ObjectId
-  head   Teacher? @relation(fields: [headId], references: [id])
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
 
-  courses  Course[]
-  teachers Teacher[]
+  // Head of the department (one-to-one)
+  headId String?  @unique @db.ObjectId
+  head   Teacher? @relation("DepartmentHead", fields: [headId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  // All teachers in the department (one-to-many)
+  teachers Teacher[] @relation("DepartmentTeachers")
+
   students Student[]
+  courses  Course[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Course {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  code        String  @unique
-  description String?
+model Teacher {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @unique @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
 
-  departmentId String     @db.ObjectId
-  department   Department @relation(fields: [departmentId], references: [id])
+  // Department teacher belongs to (many-to-one)
+  departmentId String?     @db.ObjectId
+  department   Department? @relation("DepartmentTeachers", fields: [departmentId], references: [id])
 
-  teacherId String?  @db.ObjectId
-  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+  // Can be head of a department
+  headOf Department? @relation("DepartmentHead")
 
-  students StudentCourse[]
+  courses Course[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -67,15 +71,19 @@ model Student {
   updatedAt DateTime @updatedAt
 }
 
-model Teacher {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String @unique @db.ObjectId
-  user   User   @relation(fields: [userId], references: [id])
+model Course {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  code        String  @unique
+  description String?
 
-  departmentId String?     @db.ObjectId
-  department   Department? @relation(fields: [departmentId], references: [id])
+  departmentId String     @db.ObjectId
+  department   Department @relation(fields: [departmentId], references: [id])
 
-  courses Course[]
+  teacherId String?  @db.ObjectId
+  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+
+  students StudentCourse[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
