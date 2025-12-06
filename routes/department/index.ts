@@ -6,11 +6,53 @@ import { departmentSchema } from "../../utils/schema";
 
 const router = Router();
 
-router.get("/", authMiddleware, permit("ADMIN","TEACHER","STUDENT"), handler.listDepartments);
-router.get("/:id", authMiddleware, permit("ADMIN","TEACHER","STUDENT"), handler.getDepartment);
+// ---------------------------
+// PUBLIC / PROTECTED ROUTES
+// ---------------------------
 
-router.post("/", authMiddleware, permit("ADMIN"), validate(departmentSchema), handler.createDepartment);
-router.put("/:id", authMiddleware, permit("ADMIN"), handler.updateDepartment);
-router.delete("/:id", authMiddleware, permit("ADMIN"), handler.deleteDepartment);
+// GET ALL DEPARTMENTS
+router.get(
+  "/",
+  authMiddleware,
+  permit("ADMIN", "TEACHER", "STUDENT"),
+  handler.listDepartments
+);
+
+// GET SINGLE DEPARTMENT
+router.get(
+  "/:id",
+  authMiddleware,
+  permit("ADMIN", "TEACHER", "STUDENT"),
+  handler.getDepartment
+);
+
+// ---------------------------
+// ADMIN ONLY ROUTES
+// ---------------------------
+
+// CREATE DEPARTMENT
+router.post(
+  "/",
+  authMiddleware,
+  permit("ADMIN"),
+  validate(departmentSchema),
+  handler.createDepartment
+);
+
+// UPDATE DEPARTMENT
+router.put(
+  "/:id",
+  authMiddleware,
+  permit("ADMIN"),
+  handler.updateDepartment
+);
+
+// DELETE DEPARTMENT
+router.delete(
+  "/:id",
+  authMiddleware,
+  permit("ADMIN"),
+  handler.deleteDepartment
+);
 
 export default router;

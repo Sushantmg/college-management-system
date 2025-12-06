@@ -6,11 +6,53 @@ import { courseSchema } from "../../utils/schema";
 
 const router = Router();
 
-router.get("/", authMiddleware, permit("ADMIN","TEACHER","STUDENT"), handler.listCourses);
-router.get("/:id", authMiddleware, permit("ADMIN","TEACHER","STUDENT"), handler.getCourse);
+// ----------------------------
+// All Users: Admin, Teacher, Student
+// ----------------------------
+router.get(
+  "/",
+  authMiddleware,
+  permit("ADMIN", "TEACHER", "STUDENT"),
+  handler.listCourses
+);
 
-router.post("/", authMiddleware, permit("ADMIN","TEACHER"), validate(courseSchema), handler.createCourse);
-router.put("/:id", authMiddleware, permit("ADMIN","TEACHER"), handler.updateCourse);
-router.delete("/:id", authMiddleware, permit("ADMIN"), handler.deleteCourse);
+router.get(
+  "/:id",
+  authMiddleware,
+  permit("ADMIN", "TEACHER", "STUDENT"),
+  handler.getCourse
+);
+
+// ----------------------------
+// Create Course: Only Admin + Teacher
+// ----------------------------
+router.post(
+  "/",
+  authMiddleware,
+  permit("ADMIN", "TEACHER"),
+  validate(courseSchema), 
+  handler.createCourse
+);
+
+// ----------------------------
+// Update Course: Only Admin + Teacher
+// ----------------------------
+router.put(
+  "/:id",
+  authMiddleware,
+  permit("ADMIN", "TEACHER"),
+  validate(courseSchema), 
+  handler.updateCourse
+);
+
+// ----------------------------
+// Delete Course: Only Admin
+// ----------------------------
+router.delete(
+  "/:id",
+  authMiddleware,
+  permit("ADMIN"),
+  handler.deleteCourse
+);
 
 export default router;
