@@ -1,12 +1,21 @@
 import { Request, Response, NextFunction } from "express";
-import { ZodSchema } from "zod";
+import { ZodSchema, ZodError } from "zod";
+import { RequestWithUser } from "../types/global-types";
 
+// -------------------------
+// Generic Validation Middleware
+// -------------------------
+// Works with Request or RequestWithUser
 export const validate =
-  (schema: ZodSchema<any>) => (req: Request, res: Response, next: NextFunction) => {
+  <T>(schema: ZodSchema<T>) =>
+  (req: (Request | RequestWithUser) & { body: T }, res: Response, next: NextFunction) => {
     try {
-      schema.parse(req.body);
+      schema.parse(req.body); // req.body is typed as T
       next();
-    } catch (err: any) {
-      return res.status(400).json({ error: err.errors ?? err.message });
+    } catch (err) {
+      if (err instanceof ZodError) {
+        return res.status(400).json({ error: err.errors });
+      }
+      return res.status(400).json({ error: "Invalid request body" });
     }
   };
