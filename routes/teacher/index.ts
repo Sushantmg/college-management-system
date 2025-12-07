@@ -6,11 +6,60 @@ import { teacherCreateSchema } from "../../utils/schema";
 
 const router = Router();
 
-router.get("/", authMiddleware, permit("ADMIN","TEACHER"), handler.listTeachers);
-router.get("/:id", authMiddleware, permit("ADMIN","TEACHER"), handler.getTeacher);
+// ================================
+// GET ALL TEACHERS
+// ADMIN + TEACHER
+// ================================
+router.get(
+  "/",
+  authMiddleware,
+  permit("ADMIN", "TEACHER"),
+  handler.listTeachers
+);
 
-router.post("/", authMiddleware, permit("ADMIN"), validate(teacherCreateSchema), handler.createTeacher);
-router.put("/:id", authMiddleware, permit("ADMIN"), handler.updateTeacher);
-router.delete("/:id", authMiddleware, permit("ADMIN"), handler.deleteTeacher);
+// ================================
+// GET SINGLE TEACHER
+// ADMIN + TEACHER
+// ================================
+router.get(
+  "/:id",
+  authMiddleware,
+  permit("ADMIN", "TEACHER"),
+  handler.getTeacher
+);
+
+// ================================
+// CREATE TEACHER
+// ONLY ADMIN
+// ================================
+router.post(
+  "/",
+  authMiddleware,
+  permit("ADMIN"),
+  validate(teacherCreateSchema),
+  handler.createTeacher
+);
+
+// ================================
+// UPDATE TEACHER
+// ONLY ADMIN
+// ================================
+router.put(
+  "/:id",
+  authMiddleware,
+  permit("ADMIN"),
+  handler.updateTeacher
+);
+
+// ================================
+// DELETE TEACHER
+// ONLY ADMIN
+// ================================
+router.delete(
+  "/:id",
+  authMiddleware,
+  permit("ADMIN"),
+  handler.deleteTeacher
+);
 
 export default router;
