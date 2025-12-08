@@ -1,7 +1,10 @@
-import express, { Application, Request, Response, NextFunction } from "express";
+import express from "express";
+import type { Application, Request, Response, NextFunction } from "express";
+
 import cors from "cors";
 import dotenv from "dotenv";
 import prisma from "./prisma-config";
+
 
 // Import routes
 import authRoutes from "./routes/auth";
