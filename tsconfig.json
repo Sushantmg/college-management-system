@@ -1,39 +1,19 @@
 {
   "compilerOptions": {
-    // Project structure
-    "rootDir": "./src",           // Your source files
-    "outDir": "./dist",           // Compiled JS output
-
-    // Module settings for Node ESM
-    "module": "nodenext",
-    "moduleResolution": "NodeNext",
-    "target": "es2022",           // Modern JS target for Node 18+
-    "esModuleInterop": true,      // Allows default imports from CommonJS
-    "forceConsistentCasingInFileNames": true,
-
-    // Type checking
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "rootDir": ".",
+    "outDir": "dist",
     "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
-
-    // Declaration files
-    "declaration": true,
-    "declarationMap": true,
-
-    // Source maps
-    "sourceMap": true,
-
-    // Module syntax
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-
-    // Node types
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
     "types": ["node"],
-
-    // JSX (if you have frontend code in TSX)
-    "jsx": "react-jsx"
+    "sourceMap": true
   },
-  "include": ["src/**/*"],
+
+  "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
