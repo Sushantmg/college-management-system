@@ -14,12 +14,9 @@ export const validate =
       req.body = parsed; // ✔ now body is type-safe everywhere
       return next();
     } catch (err) {
-      if (err instanceof ZodError) {
-        return res.status(400).json({
-          error: "Validation failed",
-          details: err.errors, // cleaner error structure
-        });
-      }
-      return res.status(400).json({ error: "Invalid request body" });
-    }
-  };
+     if (err instanceof ZodError) {
+  return res.status(400).json({
+    error: "Validation failed",
+    details: err.issues, // <-- use .issues
+  });
+     }}}
