@@ -1,12 +1,9 @@
 import express from "express";
 import type { Application, Request, Response, NextFunction } from "express";
-
 import cors from "cors";
 import dotenv from "dotenv";
-import prisma from "./prisma-config";
 
-
-// Import routes
+// Routes
 import authRoutes from "./routes/auth";
 import courseRoutes from "./routes/course";
 import departmentRoutes from "./routes/department";
@@ -15,8 +12,8 @@ import teacherRoutes from "./routes/teacher";
 
 dotenv.config();
 
+// Create app
 const app: Application = express();
-const PORT = process.env.PORT || 3005;
 
 // Middleware
 app.use(express.json());
@@ -28,24 +25,24 @@ app.use(
   })
 );
 
-// API Test Route
+// Test route
 app.get("/", (_req: Request, res: Response) => {
   res.send("🎓 College Management System API Running Successfully!");
 });
 
-// Register all routes
+// Register routes
 app.use("/auth", authRoutes);
 app.use("/courses", courseRoutes);
 app.use("/departments", departmentRoutes);
 app.use("/students", studentRoutes);
 app.use("/teachers", teacherRoutes);
 
-// 404 Handler
+// 404 handler
 app.use((_req: Request, res: Response) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-// Global Error Handler
+// Global error handler
 app.use(
   (err: Error, _req: Request, res: Response, _next: NextFunction) => {
     console.error("SERVER ERROR:", err);
@@ -53,19 +50,4 @@ app.use(
   }
 );
 
-// Start server + check Prisma connection
-async function startServer() {
-  try {
-    await prisma.$connect();
-    console.log("🟢 Prisma connected to MongoDB Atlas!");
-
-    app.listen(PORT, () =>
-      console.log(`🚀 Server running at http://localhost:${PORT}`)
-    );
-  } catch (err) {
-    console.error("🔴 Failed to connect to the database:", err);
-    process.exit(1);
-  }
-}
-
-startServer();
+export default app;
