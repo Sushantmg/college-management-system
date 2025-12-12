@@ -16,10 +16,9 @@ const validate = (schema) => (req, res, next) => {
         if (err instanceof zod_1.ZodError) {
             return res.status(400).json({
                 error: "Validation failed",
-                details: err.errors, // cleaner error structure
+                details: err.issues, // <-- use .issues
             });
         }
-        return res.status(400).json({ error: "Invalid request body" });
     }
 };
 exports.validate = validate;
