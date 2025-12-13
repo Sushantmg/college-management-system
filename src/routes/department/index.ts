@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as handler from "./handler";
 import { authMiddleware, permit } from "../../../middleware/authMiddleware";
 import { validate } from "../../../middleware/validationMiddleware";
-import { departmentSchema } from "../../../utils/schema";
+import { departmentSchema } from "../../utils/schema";
 
 const router = Router();
 

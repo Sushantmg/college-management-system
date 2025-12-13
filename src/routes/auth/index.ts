@@ -12,7 +12,7 @@ import {
 } from "../../middleware/auth.middleware";
 
 import { validate } from "../../../middleware/validationMiddleware";
-import { registerSchema, loginSchema } from "../../../utils/schema";
+import { registerSchema, loginSchema } from "../../utils/schema";
 
 const router = Router();
 
