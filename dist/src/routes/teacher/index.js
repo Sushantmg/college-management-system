@@ -37,7 +37,7 @@ const express_1 = require("express");
 const handler = __importStar(require("./handler"));
 const authMiddleware_1 = require("../../../middleware/authMiddleware");
 const validationMiddleware_1 = require("../../../middleware/validationMiddleware");
-const schema_1 = require("../../../utils/schema");
+const schema_1 = require("../../utils/schema");
 const router = (0, express_1.Router)();
 // ================================
 // GET ALL TEACHERS

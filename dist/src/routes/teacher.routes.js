@@ -34,27 +34,23 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const handler = __importStar(require("./handler"));
-const authMiddleware_1 = require("../../../middleware/authMiddleware");
-const validationMiddleware_1 = require("../../../middleware/validationMiddleware");
-const schema_1 = require("../../utils/schema");
+const controller = __importStar(require("../controllers/teacher.controller"));
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const validationMiddleware_1 = require("../middleware/validationMiddleware");
+const schema_1 = require("../utils/schema");
 const router = (0, express_1.Router)();
-// ----------------------------
-// All Users: Admin, Teacher, Student
-// ----------------------------
-router.get("/", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER", "STUDENT"), handler.listCourses);
-router.get("/:id", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER", "STUDENT"), handler.getCourse);
-// ----------------------------
-// Create Course: Only Admin + Teacher
-// ----------------------------
-router.post("/", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER"), (0, validationMiddleware_1.validate)(schema_1.courseSchema), handler.createCourse);
-// ----------------------------
-// Update Course: Only Admin + Teacher
-// ----------------------------
-router.put("/:id", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER"), (0, validationMiddleware_1.validate)(schema_1.courseSchema), handler.updateCourse);
-// ----------------------------
-// Delete Course: Only Admin
-// ----------------------------
-router.delete("/:id", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN"), handler.deleteCourse);
+/* =========================
+   TEACHER ROUTES
+========================= */
+// List teachers (ADMIN + TEACHER)
+router.get("/", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER"), controller.listTeachers);
+// Get single teacher
+router.get("/:id", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER"), controller.getTeacher);
+// Create teacher (ADMIN only)
+router.post("/", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN"), (0, validationMiddleware_1.validate)(schema_1.teacherCreateSchema), controller.createTeacher);
+// Update teacher (ADMIN only)
+router.put("/:id", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN"), controller.updateTeacher);
+// Delete teacher (ADMIN only)
+router.delete("/:id", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN"), controller.deleteTeacher);
 exports.default = router;
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=teacher.routes.js.map

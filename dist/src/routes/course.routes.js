@@ -34,27 +34,27 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const handler = __importStar(require("./handler"));
-const authMiddleware_1 = require("../../../middleware/authMiddleware");
-const validationMiddleware_1 = require("../../../middleware/validationMiddleware");
-const schema_1 = require("../../utils/schema");
+const controller = __importStar(require("../controllers/course.controller"));
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const validationMiddleware_1 = require("../middleware/validationMiddleware");
+const schema_1 = require("../utils/schema");
 const router = (0, express_1.Router)();
 // ----------------------------
-// All Users: Admin, Teacher, Student
+// View Courses
 // ----------------------------
-router.get("/", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER", "STUDENT"), handler.listCourses);
-router.get("/:id", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER", "STUDENT"), handler.getCourse);
+router.get("/", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER", "STUDENT"), controller.listCourses);
+router.get("/:id", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER", "STUDENT"), controller.getCourse);
 // ----------------------------
-// Create Course: Only Admin + Teacher
+// Create Course
 // ----------------------------
-router.post("/", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER"), (0, validationMiddleware_1.validate)(schema_1.courseSchema), handler.createCourse);
+router.post("/", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER"), (0, validationMiddleware_1.validate)(schema_1.courseSchema), controller.createCourse);
 // ----------------------------
-// Update Course: Only Admin + Teacher
+// Update Course
 // ----------------------------
-router.put("/:id", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER"), (0, validationMiddleware_1.validate)(schema_1.courseSchema), handler.updateCourse);
+router.put("/:id", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN", "TEACHER"), (0, validationMiddleware_1.validate)(schema_1.courseSchema), controller.updateCourse);
 // ----------------------------
-// Delete Course: Only Admin
+// Delete Course
 // ----------------------------
-router.delete("/:id", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN"), handler.deleteCourse);
+router.delete("/:id", authMiddleware_1.authMiddleware, (0, authMiddleware_1.permit)("ADMIN"), controller.deleteCourse);
 exports.default = router;
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=course.routes.js.map
