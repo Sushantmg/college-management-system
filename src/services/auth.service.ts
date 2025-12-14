@@ -2,7 +2,10 @@
 import prisma from "../prisma-config";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { RegisterInput, LoginInput } from "../types/schema-types";
+import type { RegisterInput, LoginInput } from "../utils/schema.js";
+
+
+
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 const SALT = 10;
