@@ -3,7 +3,7 @@ import type { Application, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-// Routes
+// Routes (all imports without .ts extensions for consistency)
 import authRoutes from "./routes/auth";
 import courseRoutes from "./routes/course";
 import departmentRoutes from "./routes/department";
