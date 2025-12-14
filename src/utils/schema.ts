@@ -49,3 +49,14 @@ export const teacherCreateSchema = z.object({
   userId: z.string().min(1, "User ID required"),
   departmentId: z.string().nullable().optional() // Teacher may have no department
 });
+
+/* -----------------------------
+   INFERRED TYPES (IMPORTANT)
+----------------------------- */
+export type RegisterInput = z.infer<typeof registerSchema>;
+export type LoginInput = z.infer<typeof loginSchema>;
+
+export type CourseInput = z.infer<typeof courseSchema>;
+export type DepartmentInput = z.infer<typeof departmentSchema>;
+export type StudentCreateInput = z.infer<typeof studentCreateSchema>;
+export type TeacherCreateInput = z.infer<typeof teacherCreateSchema>;
