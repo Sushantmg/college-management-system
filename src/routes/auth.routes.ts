@@ -1,37 +1,73 @@
-// src/routes/auth.routes.ts
 import { Router } from "express";
+
 import {
   register,
   login,
   getMe,
   changePassword,
-} from "../controllers/auth.controller";
+} from "../controllers/auth.controller.js";
 
-import { validateToken, allowRoles } from "../middleware/authMiddleware";
-import { validate } from "../middleware/validationMiddleware";
-import { registerSchema, loginSchema } from "../utils/schema";
+import {
+  authMiddleware,
+  permit,
+} from "../middleware/authMiddleware.js";
+
+import { validate } from "../middleware/validationMiddleware.js";
+
+import {
+  registerSchema,
+  loginSchema,
+} from "../utils/schema.js";
 
 const router = Router();
 
-router.post("/register", validate(registerSchema), register);
-router.post("/login", validate(loginSchema), login);
+// PUBLIC
+router.post(
+  "/register",
+  validate(registerSchema),
+  register
+);
 
-router.get("/me", validateToken, getMe);
-router.post("/change-password", validateToken, changePassword);
+router.post(
+  "/login",
+  validate(loginSchema),
+  login
+);
 
-// Role test routes
+// PROTECTED
+router.get(
+  "/me",
+  authMiddleware,
+  getMe
+);
+
+router.post(
+  "/change-password",
+  authMiddleware,
+  changePassword
+);
+
+// ROLE BASED
 router.get(
   "/admin-only",
-  validateToken,
-  allowRoles("ADMIN"),
-  (_req, res) => res.json({ message: "Admin access granted" })
+  authMiddleware,
+  permit("ADMIN"),
+  (_req, res) => {
+    res.json({
+      message: "Admin access granted",
+    });
+  }
 );
 
 router.get(
   "/student-only",
-  validateToken,
-  allowRoles("STUDENT"),
-  (_req, res) => res.json({ message: "Hello Student" })
+  authMiddleware,
+  permit("STUDENT"),
+  (_req, res) => {
+    res.json({
+      message: "Hello Student",
+    });
+  }
 );
 
 export default router;
