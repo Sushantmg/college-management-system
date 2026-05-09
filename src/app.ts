@@ -1,22 +1,32 @@
 import express from "express";
-import type { Application, Request, Response, NextFunction } from "express";
+import type {
+  Application,
+  Request,
+  Response,
+  NextFunction,
+} from "express";
+
 import cors from "cors";
 import dotenv from "dotenv";
 
-// Routes (all imports without .ts extensions for consistency)
-import authRoutes from "./routes/auth";
-import courseRoutes from "./routes/course";
-import departmentRoutes from "./routes/department";
-import studentRoutes from "./routes/student";
-import teacherRoutes from "./routes/teacher";
+// Routes
+import authRoutes from "./routes/auth.routes.js";
+import courseRoutes from "./routes/course.routes.js";
+import departmentRoutes from "./routes/department.routes.js";
+import studentRoutes from "./routes/student.routes.js";
+import teacherRoutes from "./routes/teacher.routes.js";
 
 dotenv.config();
 
 // Create app
 const app: Application = express();
 
-// Middleware
+// ------------------------------------
+// MIDDLEWARE
+// ------------------------------------
+
 app.use(express.json());
+
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -25,28 +35,52 @@ app.use(
   })
 );
 
-// Test route
+// ------------------------------------
+// TEST ROUTE
+// ------------------------------------
+
 app.get("/", (_req: Request, res: Response) => {
-  res.send("🎓 College Management System API Running Successfully!");
+  res.send(
+    "🎓 College Management System API Running Successfully!"
+  );
 });
 
-// Register routes
+// ------------------------------------
+// API ROUTES
+// ------------------------------------
+
 app.use("/auth", authRoutes);
 app.use("/courses", courseRoutes);
 app.use("/departments", departmentRoutes);
 app.use("/students", studentRoutes);
 app.use("/teachers", teacherRoutes);
 
-// 404 handler
+// ------------------------------------
+// 404 HANDLER
+// ------------------------------------
+
 app.use((_req: Request, res: Response) => {
-  res.status(404).json({ error: "Route not found" });
+  res.status(404).json({
+    error: "Route not found",
+  });
 });
 
-// Global error handler
+// ------------------------------------
+// GLOBAL ERROR HANDLER
+// ------------------------------------
+
 app.use(
-  (err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  (
+    err: Error,
+    _req: Request,
+    res: Response,
+    _next: NextFunction
+  ) => {
     console.error("SERVER ERROR:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+
+    res.status(500).json({
+      error: "Internal Server Error",
+    });
   }
 );
 
