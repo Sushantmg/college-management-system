@@ -5,19 +5,19 @@ import {
   login,
   getMe,
   changePassword,
-} from "../controllers/auth.controller.js";
+} from "../controllers/auth.controller";
 
 import {
   authMiddleware,
   permit,
-} from "../middleware/authMiddleware.js";
+} from "../middleware/authMiddleware";
 
-import { validate } from "../middleware/validationMiddleware.js";
+import { validate } from "../middleware/validationMiddleware";
 
 import {
   registerSchema,
   loginSchema,
-} from "../utils/schema.js";
+} from "../utils/schema";
 
 const router = Router();
 

@@ -10,11 +10,11 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 // Routes
-import authRoutes from "./routes/auth.routes.js";
-import courseRoutes from "./routes/course.routes.js";
-import departmentRoutes from "./routes/department.routes.js";
-import studentRoutes from "./routes/student.routes.js";
-import teacherRoutes from "./routes/teacher.routes.js";
+import authRoutes from "./routes/auth.routes";
+import courseRoutes from "./routes/course.routes";
+import departmentRoutes from "./routes/department.routes";
+import studentRoutes from "./routes/student.routes";
+import teacherRoutes from "./routes/teacher.routes";
 
 dotenv.config();
 

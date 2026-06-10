@@ -21,20 +21,28 @@ export const createCourse = async (req: Request, res: Response) => {
    LIST COURSES
 ========================= */
 export const listCourses = async (_req: Request, res: Response) => {
-  const courses = await courseService.listCourses();
-  return res.json(courses);
+  try {
+    const courses = await courseService.listCourses();
+    return res.json(courses);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
 };
 
 /* =========================
    GET SINGLE COURSE
 ========================= */
 export const getCourse = async (req: Request, res: Response) => {
-  const course = await courseService.getCourseById(req.params.id);
+  try {
+    const course = await courseService.getCourseById(req.params.id);
 
-  if (!course)
-    return res.status(404).json({ error: "Course not found" });
+    if (!course)
+      return res.status(404).json({ error: "Course not found" });
 
-  return res.json(course);
+    return res.json(course);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
 };
 
 /* =========================
@@ -60,10 +68,14 @@ export const updateCourse = async (req: Request, res: Response) => {
    DELETE COURSE
 ========================= */
 export const deleteCourse = async (req: Request, res: Response) => {
-  await courseService.deleteCourse(req.params.id);
+  try {
+    await courseService.deleteCourse(req.params.id);
 
-  return res.json({
-    message: "Course deleted successfully",
-    ok: true
-  });
+    return res.json({
+      message: "Course deleted successfully",
+      ok: true
+    });
+  } catch (err: any) {
+    return res.status(400).json({ error: err.message });
+  }
 };

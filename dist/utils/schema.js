@@ -46,4 +46,3 @@ exports.teacherCreateSchema = zod_1.z.object({
     userId: zod_1.z.string().min(1, "User ID required"),
     departmentId: zod_1.z.string().nullable().optional() // Teacher may have no department
 });
-//# sourceMappingURL=schema.js.map

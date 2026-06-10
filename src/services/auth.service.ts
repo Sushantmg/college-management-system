@@ -2,7 +2,7 @@
 import prisma from "../prisma-config";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import type { RegisterInput, LoginInput } from "../utils/schema.js";
+import type { RegisterInput, LoginInput } from "../utils/schema";
 
 
 
