@@ -11,11 +11,10 @@ async function startServer() {
   if (!url || url.startsWith("mongodb+srv")) {
     console.log("🔄 Starting in-memory MongoDB...");
     const { MongoMemoryServer } = await import("mongodb-memory-server");
-    const mongod = await MongoMemoryServer.create({
-      instance: { dbName: "college-management" },
-    });
-    process.env.DATABASE_URL = mongod.getUri();
-    console.log("🟢 In-memory MongoDB ready");
+    const mongod = await MongoMemoryServer.create();
+    const uri = mongod.getUri("college-management");
+    process.env.DATABASE_URL = uri;
+    console.log("🟢 In-memory MongoDB ready:", uri);
   }
 
   // Import app lazily so prisma-config.ts picks up the correct DATABASE_URL
