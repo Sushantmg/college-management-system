@@ -33,13 +33,9 @@ model Department {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String @unique
 
-  // Head of the department (one-to-one)
-  headId String?  @unique @db.ObjectId
-  head   Teacher? @relation("DepartmentHead", fields: [headId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  headId String? @db.ObjectId
 
-  // All teachers in the department (one-to-many)
   teachers Teacher[] @relation("DepartmentTeachers")
-
   students Student[]
   courses  Course[]
 
@@ -52,12 +48,8 @@ model Teacher {
   userId String @unique @db.ObjectId
   user   User   @relation(fields: [userId], references: [id])
 
-  // Department teacher belongs to (many-to-one)
   departmentId String?     @db.ObjectId
   department   Department? @relation("DepartmentTeachers", fields: [departmentId], references: [id])
-
-  // Can be head of a department
-  headOf Department? @relation("DepartmentHead")
 
   courses Course[]
 
@@ -105,7 +97,7 @@ model StudentCourse {
   student Student @relation(fields: [studentId], references: [id])
   course  Course  @relation(fields: [courseId], references: [id])
 
-  grade String? // "A", "B+", "C", etc.
+  grade String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
