@@ -2,13 +2,10 @@ import { Router } from "express";
 import * as controller from "../controllers/course.controller";
 import { authMiddleware, permit } from "../middleware/authMiddleware";
 import { validate } from "../middleware/validationMiddleware";
-import { courseSchema } from "../utils/schema";
+import { courseSchema, courseUpdateSchema } from "../utils/schema";
 
 const router = Router();
 
-// ----------------------------
-// View Courses
-// ----------------------------
 router.get(
   "/",
   authMiddleware,
@@ -23,9 +20,6 @@ router.get(
   controller.getCourse
 );
 
-// ----------------------------
-// Create Course
-// ----------------------------
 router.post(
   "/",
   authMiddleware,
@@ -34,20 +28,14 @@ router.post(
   controller.createCourse
 );
 
-// ----------------------------
-// Update Course
-// ----------------------------
 router.put(
   "/:id",
   authMiddleware,
   permit("ADMIN", "TEACHER"),
-  validate(courseSchema),
+  validate(courseUpdateSchema),
   controller.updateCourse
 );
 
-// ----------------------------
-// Delete Course
-// ----------------------------
 router.delete(
   "/:id",
   authMiddleware,

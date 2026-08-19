@@ -2,18 +2,22 @@ import { Router } from "express";
 import * as controller from "../controllers/department.controller";
 import { authMiddleware, permit } from "../middleware/authMiddleware";
 import { validate } from "../middleware/validationMiddleware";
-import { departmentSchema } from "../utils/schema";
+import { departmentSchema, departmentUpdateSchema } from "../utils/schema";
 
 const router = Router();
 
-// ---------------------------
-// SHARED ROUTES
-// ---------------------------
 router.get(
   "/",
   authMiddleware,
   permit("ADMIN", "TEACHER", "STUDENT"),
   controller.listDepartments
+);
+
+router.get(
+  "/all",
+  authMiddleware,
+  permit("ADMIN", "TEACHER", "STUDENT"),
+  controller.listAllDepartments
 );
 
 router.get(
@@ -23,9 +27,6 @@ router.get(
   controller.getDepartment
 );
 
-// ---------------------------
-// ADMIN ONLY ROUTES
-// ---------------------------
 router.post(
   "/",
   authMiddleware,
@@ -38,6 +39,7 @@ router.put(
   "/:id",
   authMiddleware,
   permit("ADMIN"),
+  validate(departmentUpdateSchema),
   controller.updateDepartment
 );
 

@@ -2,15 +2,10 @@ import { Router } from "express";
 import * as controller from "../controllers/student.controller";
 import { authMiddleware, permit } from "../middleware/authMiddleware";
 import { validate } from "../middleware/validationMiddleware";
-import { studentCreateSchema } from "../utils/schema";
+import { studentCreateSchema, studentUpdateSchema } from "../utils/schema";
 
 const router = Router();
 
-/* =========================
-   STUDENT ROUTES
-========================= */
-
-// List all students (Admin + Teacher)
 router.get(
   "/",
   authMiddleware,
@@ -18,7 +13,6 @@ router.get(
   controller.listStudents
 );
 
-// Get single student
 router.get(
   "/:id",
   authMiddleware,
@@ -26,7 +20,6 @@ router.get(
   controller.getStudent
 );
 
-// Create student (Admin only)
 router.post(
   "/",
   authMiddleware,
@@ -35,15 +28,14 @@ router.post(
   controller.createStudent
 );
 
-// Update student (Admin + Teacher)
 router.put(
   "/:id",
   authMiddleware,
   permit("ADMIN", "TEACHER"),
+  validate(studentUpdateSchema),
   controller.updateStudent
 );
 
-// Delete student (Admin only)
 router.delete(
   "/:id",
   authMiddleware,
