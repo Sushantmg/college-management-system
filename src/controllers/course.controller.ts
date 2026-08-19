@@ -13,10 +13,13 @@ export const createCourse = async (req: Request, res: Response) => {
   }
 };
 
-export const listCourses = async (_req: Request, res: Response) => {
+export const listCourses = async (req: Request, res: Response) => {
   try {
-    const courses = await courseService.listCourses();
-    res.json(courses);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const search = req.query.search as string | undefined;
+    const result = await courseService.listCourses(page, limit, search);
+    res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
