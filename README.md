@@ -613,9 +613,80 @@ npm run seed
 
 ---
 
-## Deployment
+## Deployment (Vercel)
 
-### Production Build
+### Prerequisites
+
+1. **MongoDB Atlas** (free tier) — https://cloud.mongodb.com
+2. **Vercel account** — https://vercel.com
+
+### Step 1: Set Up MongoDB Atlas
+
+1. Sign up at [cloud.mongodb.com](https://cloud.mongodb.com)
+2. Click **"Build a Database"** → Choose **M0 Free** tier → Create Cluster
+3. Go to **Database Access** → Add New Database User (save username/password)
+4. Go to **Network Access** → Add IP → **Allow Access from Anywhere** (0.0.0.0/0)
+5. Go to **Database** → Click **Connect** → Choose **Drivers** → Copy connection string
+6. Replace `<password>` and add database name:
+   ```
+   mongodb+srv://username:password@cluster.mongodb.net/college-management?retryWrites=true&w=majority
+   ```
+
+### Step 2: Deploy Backend (API)
+
+1. Go to [vercel.com/new](https://vercel.com/new)
+2. Import `Sushantmg/college-management-system`
+3. Configure:
+
+| Setting | Value |
+|---------|-------|
+| Framework Preset | Other |
+| Root Directory | `./` |
+| Build Command | `npx prisma generate && npx tsc` |
+| Output Directory | `api` |
+
+4. Add Environment Variables:
+
+| Name | Value |
+|------|-------|
+| `DATABASE_URL` | `mongodb+srv://user:pass@cluster.mongodb.net/college-management?retryWrites=true&w=majority` |
+| `JWT_SECRET` | Run `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
+| `CORS_ORIGIN` | `http://localhost:4000` (update after frontend deploys) |
+
+5. Deploy → Note your API URL (e.g., `https://college-api.vercel.app`)
+
+### Step 3: Deploy Frontend
+
+1. Go to [vercel.com/new](https://vercel.com/new) again
+2. Import the **same repo** `Sushantmg/college-management-system`
+3. Configure:
+
+| Setting | Value |
+|---------|-------|
+| Framework Preset | Vite |
+| Root Directory | `./frontend` |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
+
+4. Add Environment Variable:
+
+| Name | Value |
+|------|-------|
+| `VITE_API_URL` | `https://your-backend-api.vercel.app` |
+
+5. Deploy → Note your frontend URL
+
+### Step 4: Update Backend CORS
+
+Go back to your **backend** Vercel project → Settings → Environment Variables → Update:
+
+| Name | Value |
+|------|-------|
+| `CORS_ORIGIN` | `https://your-frontend.vercel.app` |
+
+Redeploy the backend.
+
+### Manual Production Build
 
 ```bash
 # Build backend
@@ -628,20 +699,20 @@ cd frontend && npm run build
 NODE_ENV=production node dist/server.js
 ```
 
-### Environment Variables
+### Environment Variables Reference
 
 ```env
-# Database (use MongoDB Atlas for production)
+# Database (MongoDB Atlas for production, in-memory for local dev)
 DATABASE_URL=mongodb+srv://user:pass@cluster.mongodb.net/college-management
 
-# JWT Secret (use a strong random string)
+# JWT Secret (generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
 JWT_SECRET=your-production-secret-key
 
-# Server
-PORT=3005
-
 # Frontend URL (for CORS)
-CORS_ORIGIN=https://your-domain.com
+CORS_ORIGIN=https://your-frontend.vercel.app
+
+# Frontend only (Vite)
+VITE_API_URL=https://your-backend-api.vercel.app
 ```
 
 ---
