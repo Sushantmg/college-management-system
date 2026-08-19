@@ -6,15 +6,13 @@ import {
   AuthPayload,
 } from "../types/global-types";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET missing");
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET environment variable is not set");
+  }
+  return secret;
 }
-
-// ------------------------------------
-// AUTH MIDDLEWARE
-// ------------------------------------
 
 export const authMiddleware = (
   req: RequestWithUser,
@@ -34,7 +32,7 @@ export const authMiddleware = (
   try {
     const decoded = jwt.verify(
       token,
-      JWT_SECRET
+      getJwtSecret()
     ) as AuthPayload;
 
     req.user = decoded;
@@ -52,10 +50,6 @@ export const authMiddleware = (
     });
   }
 };
-
-// ------------------------------------
-// ROLE AUTHORIZATION
-// ------------------------------------
 
 export const permit = (
   ...allowedRoles: AuthPayload["role"][]
@@ -81,13 +75,5 @@ export const permit = (
   };
 };
 
-// ------------------------------------
-// SHORTCUTS
-// ------------------------------------
-
 export const superUserOnly = permit("SUPERUSER");
-
-export const staffOnly = permit(
-  "STAFF",
-  "SUPERUSER"
-);
+export const staffOnly = permit("STAFF", "SUPERUSER");

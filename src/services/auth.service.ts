@@ -1,14 +1,18 @@
-// src/services/auth.service.ts
+import { Role } from "@prisma/client";
 import prisma from "../prisma-config";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import type { RegisterInput, LoginInput } from "../utils/schema";
 
-
-
-
-const JWT_SECRET = process.env.JWT_SECRET || "secret";
 const SALT = 10;
+
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET environment variable is not set");
+  }
+  return secret;
+}
 
 export class AuthService {
   static async register(data: RegisterInput) {
@@ -30,7 +34,6 @@ export class AuthService {
       },
     });
 
-    // Create profile stubs
     if (user.role === "STUDENT") {
       await prisma.student.create({ data: { userId: user.id } }).catch(() => {});
     }
@@ -41,7 +44,7 @@ export class AuthService {
 
     const token = jwt.sign(
       { userId: user.id, role: user.role },
-      JWT_SECRET,
+      getJwtSecret(),
       { expiresIn: "7d" }
     );
 
@@ -67,7 +70,7 @@ export class AuthService {
 
     const token = jwt.sign(
       { userId: user.id, role: user.role },
-      JWT_SECRET,
+      getJwtSecret(),
       { expiresIn: "7d" }
     );
 
@@ -83,7 +86,7 @@ export class AuthService {
   }
 
   static async getMe(userId: string) {
-    return prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -92,8 +95,22 @@ export class AuthService {
         role: true,
         createdAt: true,
         updatedAt: true,
+        student: {
+          include: {
+            department: true,
+            courses: { include: { course: true } },
+          },
+        },
+        teacher: {
+          include: {
+            department: true,
+            courses: true,
+          },
+        },
       },
     });
+
+    return user;
   }
 
   static async changePassword(
@@ -117,6 +134,87 @@ export class AuthService {
       data: { password: hashed },
     });
 
+    return true;
+  }
+
+  static async listUsers(page = 1, limit = 20, search?: string) {
+    const skip = (page - 1) * limit;
+
+    const where = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: "insensitive" as const } },
+            { email: { contains: search, mode: "insensitive" as const } },
+          ],
+        }
+      : {};
+
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.user.count({ where }),
+    ]);
+
+    return {
+      users,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  static async updateUser(userId: string, data: { name?: string; email?: string; role?: string }) {
+    const updateData: { name?: string; email?: string; role?: Role } = {
+      name: data.name,
+      email: data.email,
+    };
+    if (data.role) {
+      updateData.role = data.role as Role;
+    }
+    return prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  static async deleteUser(userId: string) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new Error("USER_NOT_FOUND");
+
+    if (user.role === "STUDENT") {
+      await prisma.studentCourse.deleteMany({ where: { student: { userId } } });
+      await prisma.student.delete({ where: { userId } }).catch(() => {});
+    }
+
+    if (user.role === "TEACHER") {
+      await prisma.course.updateMany({ where: { teacherId: user.id }, data: { teacherId: null } });
+      await prisma.teacher.delete({ where: { userId } }).catch(() => {});
+    }
+
+    await prisma.user.delete({ where: { id: userId } });
     return true;
   }
 }
