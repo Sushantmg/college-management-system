@@ -7,6 +7,9 @@ import type {
 } from "express";
 
 import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 
 // Routes
@@ -15,60 +18,79 @@ import courseRoutes from "./routes/course.routes";
 import departmentRoutes from "./routes/department.routes";
 import studentRoutes from "./routes/student.routes";
 import teacherRoutes from "./routes/teacher.routes";
+import enrollmentRoutes from "./routes/enrollment.routes";
 
 dotenv.config();
 
-// Create app
 const app: Application = express();
 
-// ------------------------------------
-// MIDDLEWARE
-// ------------------------------------
+// Security middleware
+app.use(helmet());
 
-app.use(express.json());
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { error: "Too many requests, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use("/api/", limiter);
 
+// Auth rate limiter (stricter)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { error: "Too many auth attempts, please try again later." },
+});
+app.use("/auth/login", authLimiter);
+app.use("/auth/register", authLimiter);
+
+// Logging
+app.use(morgan("dev"));
+
+// Body parsing
+app.use(express.json({ limit: "10mb" }));
+
+// CORS
 app.use(
   cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
 );
 
-// ------------------------------------
-// TEST ROUTE
-// ------------------------------------
-
+// Health check
 app.get("/", (_req: Request, res: Response) => {
-  res.send(
-    "🎓 College Management System API Running Successfully!"
-  );
+  res.json({
+    status: "ok",
+    message: "College Management System API",
+    version: "2.0.0",
+    timestamp: new Date().toISOString(),
+  });
 });
 
-// ------------------------------------
-// API ROUTES
-// ------------------------------------
+app.get("/health", (_req: Request, res: Response) => {
+  res.json({ status: "healthy", uptime: process.uptime() });
+});
 
+// API routes
 app.use("/auth", authRoutes);
 app.use("/courses", courseRoutes);
 app.use("/departments", departmentRoutes);
 app.use("/students", studentRoutes);
 app.use("/teachers", teacherRoutes);
+app.use("/enrollments", enrollmentRoutes);
 
-// ------------------------------------
-// 404 HANDLER
-// ------------------------------------
-
+// 404 handler
 app.use((_req: Request, res: Response) => {
   res.status(404).json({
     error: "Route not found",
   });
 });
 
-// ------------------------------------
-// GLOBAL ERROR HANDLER
-// ------------------------------------
-
+// Global error handler
 app.use(
   (
     err: Error,
@@ -79,7 +101,9 @@ app.use(
     console.error("SERVER ERROR:", err);
 
     res.status(500).json({
-      error: "Internal Server Error",
+      error: process.env.NODE_ENV === "production"
+        ? "Internal Server Error"
+        : err.message,
     });
   }
 );
