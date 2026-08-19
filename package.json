@@ -1,7 +1,7 @@
 {
   "name": "college-management-system",
   "version": "2.0.0",
-  "description": "Full-Stack College Management System - Backend API",
+  "description": "Full-Stack College Management System",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
@@ -11,7 +11,8 @@
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",
     "prisma:migrate": "prisma migrate dev",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "vercel-build": "prisma generate && tsc"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
@@ -22,7 +23,6 @@
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongodb-memory-server": "^11.2.0",
     "morgan": "^1.10.0",
     "zod": "^4.1.13"
   },
@@ -38,8 +38,5 @@
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
-  },
-  "allowScripts": {
-    "mongodb-memory-server@11.2.0": true
   }
 }

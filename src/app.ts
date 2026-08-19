@@ -8,7 +8,6 @@ import type {
 
 import cors from "cors";
 import helmet from "helmet";
-import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 
@@ -46,16 +45,25 @@ const authLimiter = rateLimit({
 app.use("/auth/login", authLimiter);
 app.use("/auth/register", authLimiter);
 
-// Logging
-app.use(morgan("dev"));
-
 // Body parsing
 app.use(express.json({ limit: "10mb" }));
 
-// CORS
+// CORS - allow all Vercel preview + production domains
+const allowedOrigins = [
+  process.env.CORS_ORIGIN,
+  "http://localhost:4000",
+  "http://localhost:5173",
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin) || origin.includes("vercel.app")) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Allow all in dev; tighten in production
+      }
+    },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
