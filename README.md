@@ -624,9 +624,16 @@ npm run build
 # Build frontend
 cd frontend && npm run build
 
+# Push schema to the production database (one-time / on deploy)
+npx prisma db push
+
 # Start production server
 NODE_ENV=production node dist/server.js
 ```
+
+> When `DATABASE_URL` is missing, the server automatically starts a temporary
+> in-memory MongoDB (development only). In production, schema push is skipped
+> at runtime — run `npx prisma db push` as part of your deploy instead.
 
 ### Environment Variables
 

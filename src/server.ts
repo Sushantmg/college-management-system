@@ -4,12 +4,13 @@ import { execSync } from "child_process";
 dotenv.config();
 
 const PORT = process.env.PORT || 3005;
+const isProduction = process.env.NODE_ENV === "production";
 
 async function startServer() {
   const url = process.env.DATABASE_URL;
 
-  if (!url || url.startsWith("mongodb+srv")) {
-    console.log("Starting in-memory MongoDB replica set...");
+  if (!url) {
+    console.log("No DATABASE_URL set. Starting in-memory MongoDB replica set...");
     const { MongoMemoryReplSet } = await import("mongodb-memory-server");
     const replSet = await MongoMemoryReplSet.create({
       replSet: { count: 1, dbName: "college-management" },
@@ -26,12 +27,16 @@ async function startServer() {
     await prisma.$connect();
     console.log("Prisma connected to MongoDB!");
 
-    console.log("Pushing database schema...");
-    execSync("npx prisma db push --skip-generate --accept-data-loss", {
-      env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
-      stdio: "inherit",
-    });
-    console.log("Schema pushed successfully!");
+    if (!isProduction) {
+      // Push schema at startup only outside production.
+      // In production, the schema is pushed as part of the deploy.
+      console.log("Pushing database schema...");
+      execSync("npx prisma db push --skip-generate --accept-data-loss", {
+        env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
+        stdio: "inherit",
+      });
+      console.log("Schema pushed successfully!");
+    }
 
     app.listen(PORT, () => {
       console.log(`Server running at http://localhost:${PORT}`);
