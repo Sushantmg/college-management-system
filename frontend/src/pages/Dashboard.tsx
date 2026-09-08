@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import Layout from "../components/Layout";
 import StatsCard from "../components/StatsCard";
-import { Building2, Users, GraduationCap, BookOpen, TrendingUp, Award } from "lucide-react";
+import { Building2, Users, GraduationCap, BookOpen } from "lucide-react";
 import { departmentsApi, type Department } from "../api/departments";
 import { coursesApi, type Course } from "../api/courses";
 import { studentsApi } from "../api/students";

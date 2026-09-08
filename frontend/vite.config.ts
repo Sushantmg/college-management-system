@@ -13,6 +13,7 @@ export default defineConfig({
       '/students': 'http://localhost:3005',
       '/teachers': 'http://localhost:3005',
       '/enrollments': 'http://localhost:3005',
+      '/stats': 'http://localhost:3005',
     },
   },
 })

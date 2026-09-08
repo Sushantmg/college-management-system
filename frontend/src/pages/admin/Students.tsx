@@ -3,7 +3,7 @@ import Layout from "../../components/Layout";
 import Modal from "../../components/Modal";
 import { studentsApi, type Student } from "../../api/students";
 import { departmentsApi, type Department } from "../../api/departments";
-import { Plus, Pencil, Trash2, Search, GraduationCap } from "lucide-react";
+import { Pencil, Trash2, Search, GraduationCap } from "lucide-react";
 
 export default function Students() {
   const [students, setStudents] = useState<Student[]>([]);

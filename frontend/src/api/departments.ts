@@ -13,13 +13,13 @@ export interface Department {
   updatedAt: string;
 }
 
-export interface PaginatedResponse<T> {
+export interface PaginatedResponse {
   pagination: { page: number; limit: number; total: number; pages: number };
 }
 
 export const departmentsApi = {
   list: (page = 1, limit = 20, search?: string) =>
-    api.get<{ departments: Department[] } & PaginatedResponse<Department>>("/departments", {
+    api.get<{ departments: Department[] } & PaginatedResponse>("/departments", {
       params: { page, limit, search },
     }),
 

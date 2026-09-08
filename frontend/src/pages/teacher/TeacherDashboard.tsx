@@ -4,9 +4,9 @@ import StatsCard from "../../components/StatsCard";
 import Modal from "../../components/Modal";
 import { useAuth } from "../../context/AuthContext";
 import { coursesApi, type Course } from "../../api/courses";
-import { enrollmentsApi, type Enrollment } from "../../api/enrollments";
+import { enrollmentsApi } from "../../api/enrollments";
 import { studentsApi, type Student } from "../../api/students";
-import { BookOpen, Users, Award, Plus, X } from "lucide-react";
+import { BookOpen, Users, Plus } from "lucide-react";
 
 export default function TeacherDashboard() {
   const { user } = useAuth();

@@ -12,13 +12,13 @@ export interface Teacher {
   updatedAt: string;
 }
 
-export interface PaginatedResponse<T> {
+export interface PaginatedResponse {
   pagination: { page: number; limit: number; total: number; pages: number };
 }
 
 export const teachersApi = {
   list: (page = 1, limit = 20, search?: string) =>
-    api.get<{ teachers: Teacher[] } & PaginatedResponse<Teacher>>("/teachers", {
+    api.get<{ teachers: Teacher[] } & PaginatedResponse>("/teachers", {
       params: { page, limit, search },
     }),
 

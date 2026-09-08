@@ -1,37 +1,15 @@
 import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
-import Modal from "../../components/Modal";
 import { studentsApi, type Student } from "../../api/students";
-import { enrollmentsApi, type Enrollment } from "../../api/enrollments";
-import { GraduationCap, Award } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 
 export default function TeacherStudents() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
-  const [gradeModal, setGradeModal] = useState(false);
-  const [selectedEnrollment, setSelectedEnrollment] = useState<string>("");
-  const [gradeValue, setGradeValue] = useState("");
 
   useEffect(() => {
     studentsApi.list(1, 100).then(res => setStudents(res.data.students)).catch(console.error).finally(() => setLoading(false));
   }, []);
-
-  const openGrade = (enrollmentId: string) => {
-    setSelectedEnrollment(enrollmentId);
-    setGradeValue("");
-    setGradeModal(true);
-  };
-
-  const handleGrade = async () => {
-    if (!selectedEnrollment || !gradeValue) return;
-    try {
-      await enrollmentsApi.updateGrade(selectedEnrollment, gradeValue);
-      setGradeModal(false);
-      studentsApi.list(1, 100).then(res => setStudents(res.data.students));
-    } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to update grade");
-    }
-  };
 
   return (
     <Layout>
@@ -75,24 +53,6 @@ export default function TeacherStudents() {
           )}
         </div>
       </div>
-
-      <Modal open={gradeModal} onClose={() => setGradeModal(false)} title="Update Grade">
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Grade</label>
-            <select value={gradeValue} onChange={(e) => setGradeValue(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white">
-              <option value="">Select grade</option>
-              {["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "F"].map(g => (
-                <option key={g} value={g}>{g}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button onClick={() => setGradeModal(false)} className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
-            <button onClick={handleGrade} className="px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700">Update</button>
-          </div>
-        </div>
-      </Modal>
     </Layout>
   );
 }

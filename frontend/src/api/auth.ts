@@ -9,7 +9,7 @@ export interface User {
   updatedAt: string;
 }
 
-export interface PaginatedResponse<T> {
+export interface PaginatedResponse {
   pagination: {
     page: number;
     limit: number;
@@ -31,7 +31,7 @@ export const authApi = {
     api.post("/auth/change-password", { oldPassword, newPassword }),
 
   listUsers: (page = 1, limit = 20, search?: string) =>
-    api.get<{ users: User[] } & PaginatedResponse<User>>("/auth/users", {
+    api.get<{ users: User[] } & PaginatedResponse>("/auth/users", {
       params: { page, limit, search },
     }),
 

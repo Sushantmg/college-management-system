@@ -15,13 +15,13 @@ export interface Course {
   updatedAt: string;
 }
 
-export interface PaginatedResponse<T> {
+export interface PaginatedResponse {
   pagination: { page: number; limit: number; total: number; pages: number };
 }
 
 export const coursesApi = {
   list: (page = 1, limit = 20, search?: string) =>
-    api.get<{ courses: Course[] } & PaginatedResponse<Course>>("/courses", {
+    api.get<{ courses: Course[] } & PaginatedResponse>("/courses", {
       params: { page, limit, search },
     }),
 

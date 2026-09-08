@@ -11,13 +11,13 @@ export interface Enrollment {
   updatedAt: string;
 }
 
-export interface PaginatedResponse<T> {
+export interface PaginatedResponse {
   pagination: { page: number; limit: number; total: number; pages: number };
 }
 
 export const enrollmentsApi = {
   list: (page = 1, limit = 20) =>
-    api.get<{ enrollments: Enrollment[] } & PaginatedResponse<Enrollment>>("/enrollments", {
+    api.get<{ enrollments: Enrollment[] } & PaginatedResponse>("/enrollments", {
       params: { page, limit },
     }),
 

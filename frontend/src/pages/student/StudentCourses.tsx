@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import { authApi } from "../../api/auth";
-import { BookOpen, Award } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 interface Enrollment {
   id: string;
