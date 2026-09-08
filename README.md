@@ -43,7 +43,7 @@ Sign in with the [demo credentials](#demo-credentials) below.
 └──────────────────────────┼──────────────────────────────────────────┘
                            │  HTTP (Port 4000 → 3005)
                            │  Proxy: /auth, /courses, /departments,
-                           │         /students, /teachers, /enrollments
+                           │         /students, /teachers, /enrollments, /stats
                            │
 ┌──────────────────────────┼──────────────────────────────────────────┐
 │                     SERVER (Node.js)                                │
@@ -392,14 +392,16 @@ college-management-system/
 │   │   ├── course.controller.ts  # Course CRUD
 │   │   ├── department.controller.ts
 │   │   ├── enrollment.controller.ts  # Enroll, unenroll, grades
-│   │   ├── student.controller.ts
-│   │   └── teacher.controller.ts
+│   │   │   ├── stats.controller.ts   # Dashboard statistics
+│   │   │   ├── student.controller.ts
+│   │   │   └── teacher.controller.ts
 │   │
 │   ├── services/                 # Business logic layer
 │   │   ├── auth.service.ts       # JWT, bcrypt, user operations
 │   │   ├── course.service.ts     # Course queries + pagination
 │   │   ├── department.service.ts # Head lookup, cascade deletes
 │   │   ├── enrollment.service.ts # Enrollment, grade management
+│   │   ├── stats.service.ts      # Aggregated dashboard stats
 │   │   ├── student.service.ts    # Student queries + pagination
 │   │   └── teacher.service.ts    # Teacher queries + pagination
 │   │
@@ -408,6 +410,7 @@ college-management-system/
 │   │   ├── course.routes.ts
 │   │   ├── department.routes.ts
 │   │   ├── enrollment.routes.ts
+│   │   ├── stats.routes.ts
 │   │   ├── student.routes.ts
 │   │   └── teacher.routes.ts
 │   │
@@ -622,6 +625,12 @@ npm run seed
 | `GET` | `/enrollments/student/:id` | Any | Get student's enrolled courses |
 | `GET` | `/enrollments/course/:id` | Admin, Teacher | Get course's enrolled students |
 | `PATCH` | `/enrollments/:id/grade` | Admin, Teacher | Update grade (A+ to F) |
+
+### Stats
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/stats` | Any (auth) | Dashboard statistics (counts, recent items) |
 
 ---
 
