@@ -25,6 +25,10 @@ dotenv.config();
 
 const app: Application = express();
 
+// Render (and similar platforms) run behind a proxy that sets X-Forwarded-For.
+// Trusting it keeps express-rate-limit from throwing ERR_ERL_UNEXPECTED_X_FORWARDED_FOR.
+app.set("trust proxy", 1);
+
 // Security middleware
 app.use(helmet());
 
