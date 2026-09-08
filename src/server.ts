@@ -6,7 +6,7 @@ dotenv.config();
 const PORT = process.env.PORT || 3005;
 const isProduction = process.env.NODE_ENV === "production";
 
-async function startServer() {
+async function ensureDatabase() {
   const url = process.env.DATABASE_URL;
 
   if (!url) {
@@ -20,32 +20,45 @@ async function startServer() {
     console.log("In-memory MongoDB ready:", uri);
   }
 
+  if (!isProduction) {
+    // Push schema at startup only outside production.
+    // In production, the schema is pushed as part of the deploy.
+    console.log("Pushing database schema...");
+    execSync("npx prisma db push --skip-generate --accept-data-loss", {
+      env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
+      stdio: "inherit",
+    });
+    console.log("Schema pushed successfully!");
+  }
+}
+
+async function connectPrisma(prisma: any) {
+  while (true) {
+    try {
+      await prisma.$connect();
+      console.log("Prisma connected to MongoDB!");
+      return;
+    } catch (err: any) {
+      console.error("Prisma connection failed, retrying in 15s:", err?.message);
+      await new Promise((resolve) => setTimeout(resolve, 15000));
+    }
+  }
+}
+
+async function startServer() {
+  await ensureDatabase();
+
   const { default: app } = await import("./app");
   const { default: prisma } = await import("./prisma-config");
 
-  try {
-    await prisma.$connect();
-    console.log("Prisma connected to MongoDB!");
+  // Listen immediately so the API (incl. /health) is always up,
+  // even while the database connection is being (re)established.
+  app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  });
 
-    if (!isProduction) {
-      // Push schema at startup only outside production.
-      // In production, the schema is pushed as part of the deploy.
-      console.log("Pushing database schema...");
-      execSync("npx prisma db push --skip-generate --accept-data-loss", {
-        env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
-        stdio: "inherit",
-      });
-      console.log("Schema pushed successfully!");
-    }
-
-    app.listen(PORT, () => {
-      console.log(`Server running at http://localhost:${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-    });
-  } catch (err) {
-    console.error("Failed to start the server:", err);
-    process.exit(1);
-  }
+  connectPrisma(prisma);
 }
 
 startServer();
