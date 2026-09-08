@@ -19,6 +19,7 @@ import departmentRoutes from "./routes/department.routes";
 import studentRoutes from "./routes/student.routes";
 import teacherRoutes from "./routes/teacher.routes";
 import enrollmentRoutes from "./routes/enrollment.routes";
+import statsRoutes from "./routes/stats.routes";
 
 dotenv.config();
 
@@ -82,6 +83,7 @@ app.use("/departments", departmentRoutes);
 app.use("/students", studentRoutes);
 app.use("/teachers", teacherRoutes);
 app.use("/enrollments", enrollmentRoutes);
+app.use("/stats", statsRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
