@@ -4,6 +4,18 @@ A full-stack College Management System for managing departments, teachers, stude
 
 ---
 
+## Live Demo
+
+| Service | URL |
+|---------|-----|
+| **Frontend** (Vercel) | https://college-management-system-two-sable.vercel.app |
+| **Backend API** (Render) | https://college-management-system-f9a5.onrender.com |
+| **Backend Health Check** | https://college-management-system-f9a5.onrender.com/health |
+
+Sign in with the [demo credentials](#demo-credentials) below.
+
+---
+
 ## Architecture Overview
 
 ```
@@ -648,7 +660,14 @@ JWT_SECRET=your-production-secret-key
 PORT=3005
 
 # Frontend URL (for CORS)
-CORS_ORIGIN=https://your-domain.com
+CORS_ORIGIN=https://college-management-system-two-sable.vercel.app
+```
+
+On the frontend host (Vercel), set the following environment variable so the browser calls the deployed API:
+
+```env
+# Frontend deployment (Vercel)
+VITE_API_URL=https://college-management-system-f9a5.onrender.com
 ```
 
 ---
