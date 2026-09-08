@@ -12,8 +12,8 @@ async function main() {
   await prisma.studentCourse.deleteMany();
   await prisma.course.deleteMany();
   await prisma.student.deleteMany();
-  await prisma.teacher.deleteMany();
   await prisma.department.deleteMany();
+  await prisma.teacher.deleteMany();
   await prisma.user.deleteMany();
 
   // Create Admin
@@ -139,16 +139,20 @@ async function main() {
       },
     }),
     prisma.user.create({
-      name: "Rachel Green",
-      email: "rachel.green@student.college.edu",
-      password: studentPassword,
-      role: Role.STUDENT,
+      data: {
+        name: "Rachel Green",
+        email: "rachel.green@student.college.edu",
+        password: studentPassword,
+        role: Role.STUDENT,
+      },
     }),
     prisma.user.create({
-      name: "James Wilson",
-      email: "james.wilson@student.college.edu",
-      password: studentPassword,
-      role: Role.STUDENT,
+      data: {
+        name: "James Wilson",
+        email: "james.wilson@student.college.edu",
+        password: studentPassword,
+        role: Role.STUDENT,
+      },
     }),
   ]);
 
