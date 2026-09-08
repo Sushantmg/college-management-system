@@ -15,7 +15,7 @@ npm install
 npm run dev
 ```
 
-The dev server proxies API requests (`/auth`, `/courses`, `/departments`, `/students`, `/teachers`, `/enrollments`, `/stats`) to the backend at port `3005`.
+Open the app at http://localhost:4000. The dev server proxies API requests (`/auth`, `/courses`, `/departments`, `/students`, `/teachers`, `/enrollments`, `/stats`) to the backend at port `3005`.
 
 ## Deploying on Vercel
 
