@@ -202,7 +202,7 @@ erDiagram
 
     Teacher {
         ObjectId id PK
-        ObjectId userId FK UK
+        ObjectId userId UK "FK to User"
         ObjectId departmentId FK
         DateTime createdAt
         DateTime updatedAt
@@ -210,7 +210,7 @@ erDiagram
 
     Student {
         ObjectId id PK
-        ObjectId userId FK UK
+        ObjectId userId UK "FK to User"
         ObjectId departmentId FK
         DateTime createdAt
         DateTime updatedAt
