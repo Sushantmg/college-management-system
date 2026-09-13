@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import type { RegisterInput, LoginInput } from "../utils/schema";
 
 const SALT = 10;
+const DEFAULT_JWT_EXPIRES_IN = "7d";
 
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;
@@ -14,38 +15,44 @@ function getJwtSecret(): string {
   return secret;
 }
 
+function getJwtExpiresIn(): jwt.SignOptions["expiresIn"] {
+  const value = process.env.JWT_EXPIRES_IN || DEFAULT_JWT_EXPIRES_IN;
+  return value as jwt.SignOptions["expiresIn"];
+}
+
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
 export class AuthService {
   static async register(data: RegisterInput) {
-    const { name, email, password, role } = data;
+    const { name, email, password } = data;
+    const normalizedEmail = normalizeEmail(email);
 
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (existing) {
       throw new Error("USER_EXISTS");
     }
 
     const hashedPassword = await bcrypt.hash(password, SALT);
 
+    // Public signup always creates a STUDENT account. Elevated roles are
+    // only granted by an admin (no privilege escalation from the client).
     const user = await prisma.user.create({
       data: {
         name,
-        email,
+        email: normalizedEmail,
         password: hashedPassword,
-        role: role ?? "STUDENT",
+        role: "STUDENT",
       },
     });
 
-    if (user.role === "STUDENT") {
-      await prisma.student.create({ data: { userId: user.id } }).catch(() => {});
-    }
-
-    if (user.role === "TEACHER") {
-      await prisma.teacher.create({ data: { userId: user.id } }).catch(() => {});
-    }
+    await prisma.student.create({ data: { userId: user.id } }).catch(() => {});
 
     const token = jwt.sign(
       { userId: user.id, role: user.role },
       getJwtSecret(),
-      { expiresIn: "7d" }
+      { expiresIn: getJwtExpiresIn() }
     );
 
     return {
@@ -61,8 +68,9 @@ export class AuthService {
 
   static async login(data: LoginInput) {
     const { email, password } = data;
+    const normalizedEmail = normalizeEmail(email);
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (!user) throw new Error("INVALID_CREDENTIALS");
 
     const isValid = await bcrypt.compare(password, user.password);
@@ -71,7 +79,7 @@ export class AuthService {
     const token = jwt.sign(
       { userId: user.id, role: user.role },
       getJwtSecret(),
-      { expiresIn: "7d" }
+      { expiresIn: getJwtExpiresIn() }
     );
 
     return {
@@ -181,7 +189,7 @@ export class AuthService {
   static async updateUser(userId: string, data: { name?: string; email?: string; role?: string }) {
     const updateData: { name?: string; email?: string; role?: Role } = {
       name: data.name,
-      email: data.email,
+      email: data.email ? normalizeEmail(data.email) : undefined,
     };
     if (data.role) {
       updateData.role = data.role as Role;

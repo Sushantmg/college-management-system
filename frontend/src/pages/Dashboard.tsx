@@ -2,17 +2,32 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import Layout from "../components/Layout";
 import StatsCard from "../components/StatsCard";
-import { Building2, Users, GraduationCap, BookOpen } from "lucide-react";
+import {
+  Building2,
+  Users,
+  GraduationCap,
+  BookOpen,
+  UserCheck,
+} from "lucide-react";
 import { departmentsApi, type Department } from "../api/departments";
 import { coursesApi, type Course } from "../api/courses";
-import { studentsApi } from "../api/students";
-import { teachersApi } from "../api/teachers";
+import {
+  statsApi,
+  type RecentEnrollment,
+} from "../api/stats";
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [stats, setStats] = useState({ departments: 0, teachers: 0, students: 0, courses: 0 });
+  const [stats, setStats] = useState({
+    departments: 0,
+    teachers: 0,
+    students: 0,
+    courses: 0,
+    enrollments: 0,
+  });
   const [recentDepartments, setRecentDepartments] = useState<Department[]>([]);
   const [recentCourses, setRecentCourses] = useState<Course[]>([]);
+  const [recentEnrollments, setRecentEnrollments] = useState<RecentEnrollment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,20 +36,24 @@ export default function Dashboard() {
 
   const loadDashboard = async () => {
     try {
-      const [deptRes, teacherRes, studentRes, courseRes] = await Promise.all([
+      const [statsRes, deptRes, courseRes] = await Promise.all([
+        statsApi.get(),
         departmentsApi.list(1, 5),
-        teachersApi.list(1, 1),
-        studentsApi.list(1, 1),
         coursesApi.list(1, 5),
       ]);
+
+      const { counts, recentEnrollments } = statsRes.data;
+
       setStats({
-        departments: deptRes.data.pagination.total,
-        teachers: teacherRes.data.pagination.total,
-        students: studentRes.data.pagination.total,
-        courses: courseRes.data.pagination.total,
+        departments: counts.departments,
+        teachers: counts.teachers,
+        students: counts.students,
+        courses: counts.courses,
+        enrollments: counts.enrollments,
       });
       setRecentDepartments(deptRes.data.departments);
       setRecentCourses(courseRes.data.courses);
+      setRecentEnrollments(recentEnrollments);
     } catch (err) {
       console.error("Failed to load dashboard", err);
     } finally {
@@ -53,8 +72,8 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {[...Array(5)].map((_, i) => (
               <div key={i} className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-gray-200 rounded-lg" />
@@ -67,15 +86,17 @@ export default function Dashboard() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <StatsCard title="Departments" value={stats.departments} icon={<Building2 className="w-6 h-6" />} color="bg-blue-500" />
             <StatsCard title="Teachers" value={stats.teachers} icon={<Users className="w-6 h-6" />} color="bg-green-500" />
             <StatsCard title="Students" value={stats.students} icon={<GraduationCap className="w-6 h-6" />} color="bg-purple-500" />
             <StatsCard title="Courses" value={stats.courses} icon={<BookOpen className="w-6 h-6" />} color="bg-amber-500" />
+            <StatsCard title="Enrollments" value={stats.enrollments} icon={<UserCheck className="w-6 h-6" />} color="bg-teal-500" />
           </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Departments */}
           <div className="bg-white rounded-xl border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
@@ -103,6 +124,7 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Recent Courses */}
           <div className="bg-white rounded-xl border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
@@ -126,6 +148,32 @@ export default function Dashboard() {
                 <div className="px-6 py-8 text-center text-gray-500">No courses yet</div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Recent Enrollments */}
+        <div className="bg-white rounded-xl border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+              <UserCheck className="w-5 h-5 text-teal-500" />
+              Recent Enrollments
+            </h2>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {recentEnrollments.map((enrollment) => (
+              <div key={enrollment.id} className="px-6 py-3 flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-gray-900">{enrollment.student?.user?.name}</p>
+                  <p className="text-sm text-gray-500">{enrollment.student?.user?.email}</p>
+                </div>
+                <div className="text-sm text-gray-500">
+                  {enrollment.course?.code} &middot; {enrollment.course?.name}
+                </div>
+              </div>
+            ))}
+            {recentEnrollments.length === 0 && (
+              <div className="px-6 py-8 text-center text-gray-500">No enrollments yet</div>
+            )}
           </div>
         </div>
       </div>

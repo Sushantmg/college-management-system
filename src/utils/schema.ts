@@ -3,26 +3,33 @@ import { z } from "zod";
 /* -----------------------------
    AUTH SCHEMAS
 ----------------------------- */
+export const passwordComplexity = /^(?=.*[A-Za-z])(?=.*\d).+$/;
+
+// Public registration must NOT accept a role — users always start as STUDENT.
+// Roles are assigned by an admin afterwards.
 export const registerSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email format"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum(["ADMIN", "TEACHER", "STUDENT"]).optional()
+  name: z.string().trim().min(1, "Name is required").max(100, "Name is too long"),
+  email: z.string().trim().email("Invalid email format").max(254),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(passwordComplexity, "Password must contain at least one letter and one number"),
 });
 
 export const loginSchema = z.object({
-  email: z.string().email("Invalid email"),
+  email: z.string().trim().email("Invalid email"),
   password: z.string().min(6, "Password must be at least 6 characters")
 });
 
 export const changePasswordSchema = z.object({
   oldPassword: z.string().min(1, "Old password is required"),
-  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+  newPassword: z.string()
+    .min(8, "New password must be at least 8 characters")
+    .regex(passwordComplexity, "New password must contain at least one letter and one number"),
 });
 
 export const updateUserSchema = z.object({
-  name: z.string().min(1).optional(),
-  email: z.string().email().optional(),
+  name: z.string().trim().min(1).max(100).optional(),
+  email: z.string().trim().email().max(254).optional(),
   role: z.enum(["ADMIN", "TEACHER", "STUDENT", "STAFF", "SUPERUSER"]).optional(),
 });
 

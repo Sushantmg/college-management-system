@@ -6,6 +6,14 @@ import {
   AuthPayload,
 } from "../types/global-types";
 
+const VALID_ROLES: AuthPayload["role"][] = [
+  "ADMIN",
+  "TEACHER",
+  "STUDENT",
+  "STAFF",
+  "SUPERUSER",
+];
+
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;
   if (!secret) {
@@ -34,6 +42,16 @@ export const authMiddleware = (
       token,
       getJwtSecret()
     ) as AuthPayload;
+
+    if (
+      typeof decoded?.userId !== "string" ||
+      typeof decoded?.role !== "string" ||
+      !VALID_ROLES.includes(decoded.role as AuthPayload["role"])
+    ) {
+      return res.status(401).json({
+        error: "Invalid token",
+      });
+    }
 
     req.user = decoded;
 

@@ -566,7 +566,7 @@ npm run seed
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| `POST` | `/auth/register` | Public | Register new user |
+| `POST` | `/auth/register` | Public | Register a STUDENT account (role assigned by admin) |
 | `POST` | `/auth/login` | Public | Login, returns JWT |
 | `GET` | `/auth/me` | Any | Get current user profile |
 | `POST` | `/auth/change-password` | Any | Change password |
@@ -667,6 +667,9 @@ JWT_SECRET=your-production-secret-key
 
 # Server
 PORT=3005
+
+# JWT lifetime, e.g. 1d, 12h, 7d (default: 7d)
+JWT_EXPIRES_IN=7d
 
 # Frontend URL (for CORS)
 CORS_ORIGIN=https://college-management-system-two-sable.vercel.app

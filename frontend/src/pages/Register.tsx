@@ -7,7 +7,6 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("STUDENT");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,7 +18,7 @@ export default function Register() {
     setError("");
     setLoading(true);
     try {
-      await register({ name, email, password, role });
+      await register({ name, email, password });
       const user = JSON.parse(localStorage.getItem("user") || "{}");
       if (user.role === "ADMIN") navigate("/admin");
       else if (user.role === "TEACHER") navigate("/teacher");
@@ -83,7 +82,7 @@ export default function Register() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition pr-10"
-                  placeholder="At least 6 characters"
+                  placeholder="At least 8 characters"
                 />
                 <button
                   type="button"
@@ -93,18 +92,9 @@ export default function Register() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Role</label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white"
-              >
-                <option value="STUDENT">Student</option>
-                <option value="TEACHER">Teacher</option>
-              </select>
+              <p className="mt-1.5 text-xs text-gray-500">
+                Min 8 characters with at least one letter and one number. New accounts are created as students.
+              </p>
             </div>
 
             <button

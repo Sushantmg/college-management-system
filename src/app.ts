@@ -32,7 +32,18 @@ app.set("trust proxy", 1);
 // Security middleware
 app.use(helmet());
 
-// Rate limiting
+// All API routes live under these prefixes
+const apiPaths = [
+  "/auth",
+  "/courses",
+  "/departments",
+  "/students",
+  "/teachers",
+  "/enrollments",
+  "/stats",
+];
+
+// Rate limiting (applies to every API route)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -40,7 +51,7 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
-app.use("/api/", limiter);
+app.use(apiPaths, limiter);
 
 // Auth rate limiter (stricter)
 const authLimiter = rateLimit({
@@ -51,16 +62,32 @@ const authLimiter = rateLimit({
 app.use("/auth/login", authLimiter);
 app.use("/auth/register", authLimiter);
 
+// Don't let browsers cache authenticated API responses
+app.use(apiPaths, (_req: Request, res: Response, next: NextFunction) => {
+  res.set("Cache-Control", "no-store");
+  next();
+});
+
 // Logging
 app.use(morgan("dev"));
 
 // Body parsing
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "10kb" }));
 
-// CORS
+// CORS — allow a comma-separated list of origins from CORS_ORIGIN
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:4000,http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      callback(null, false);
+    },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
@@ -99,11 +126,18 @@ app.use((_req: Request, res: Response) => {
 // Global error handler
 app.use(
   (
-    err: Error,
+    err: any,
     _req: Request,
     res: Response,
     _next: NextFunction
   ) => {
+    // Malformed JSON bodies should be a 400, not a 500
+    if (err && (err.type === "entity.parse.failed" || err.status === 400)) {
+      return res.status(400).json({
+        error: "Invalid request body",
+      });
+    }
+
     console.error("SERVER ERROR:", err);
 
     res.status(500).json({
