@@ -1,6 +1,8 @@
 import { Router } from "express";
 import * as controller from "../controllers/enrollment.controller";
 import { authMiddleware, permit } from "../middleware/authMiddleware";
+import { validate } from "../middleware/validationMiddleware";
+import { enrollSchema, gradeSchema } from "../utils/schema";
 
 const router = Router();
 
@@ -17,6 +19,7 @@ router.post(
   "/",
   authMiddleware,
   permit("ADMIN", "TEACHER"),
+  validate(enrollSchema),
   controller.enrollStudent
 );
 
@@ -25,6 +28,7 @@ router.delete(
   "/",
   authMiddleware,
   permit("ADMIN", "TEACHER"),
+  validate(enrollSchema),
   controller.unenrollStudent
 );
 
@@ -49,6 +53,7 @@ router.patch(
   "/:id/grade",
   authMiddleware,
   permit("ADMIN", "TEACHER"),
+  validate(gradeSchema),
   controller.updateGrade
 );
 
