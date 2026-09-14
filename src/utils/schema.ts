@@ -1,6 +1,25 @@
 import { z } from "zod";
 
 /* -----------------------------
+   SHARED HELPERS
+----------------------------- */
+// MongoDB ObjectId is a 24-character hex string.
+export const MONGO_ID_PATTERN = /^[0-9a-fA-F]{24}$/;
+
+export const objectId = z
+  .string()
+  .min(1, "ID is required")
+  .regex(MONGO_ID_PATTERN, "Invalid ID format");
+
+export const VALID_GRADES = [
+  "A+", "A", "A-",
+  "B+", "B", "B-",
+  "C+", "C", "C-",
+  "D+", "D",
+  "F",
+] as const;
+
+/* -----------------------------
    AUTH SCHEMAS
 ----------------------------- */
 export const passwordComplexity = /^(?=.*[A-Za-z])(?=.*\d).+$/;
@@ -40,16 +59,16 @@ export const courseSchema = z.object({
   name: z.string().min(1, "Course name required"),
   code: z.string().min(1, "Course code required"),
   description: z.string().optional(),
-  departmentId: z.string().min(1, "Department is required"),
-  teacherId: z.string().optional()
+  departmentId: objectId,
+  teacherId: objectId.optional()
 });
 
 export const courseUpdateSchema = z.object({
   name: z.string().min(1).optional(),
   code: z.string().min(1).optional(),
   description: z.string().optional(),
-  departmentId: z.string().min(1).optional(),
-  teacherId: z.string().optional(),
+  departmentId: objectId.optional(),
+  teacherId: objectId.optional(),
 });
 
 /* -----------------------------
@@ -57,48 +76,48 @@ export const courseUpdateSchema = z.object({
 ----------------------------- */
 export const departmentSchema = z.object({
   name: z.string().min(1, "Department name required"),
-  headId: z.string().nullable().optional()
+  headId: objectId.nullable().optional()
 });
 
 export const departmentUpdateSchema = z.object({
   name: z.string().min(1).optional(),
-  headId: z.string().nullable().optional(),
+  headId: objectId.nullable().optional(),
 });
 
 /* -----------------------------
    STUDENT SCHEMA
 ----------------------------- */
 export const studentCreateSchema = z.object({
-  userId: z.string().min(1, "User ID required"),
-  departmentId: z.string().min(1, "Department ID required")
+  userId: objectId,
+  departmentId: objectId
 });
 
 export const studentUpdateSchema = z.object({
-  departmentId: z.string().min(1).optional(),
+  departmentId: objectId.optional(),
 });
 
 /* -----------------------------
    TEACHER SCHEMA
 ----------------------------- */
 export const teacherCreateSchema = z.object({
-  userId: z.string().min(1, "User ID required"),
-  departmentId: z.string().nullable().optional()
+  userId: objectId,
+  departmentId: objectId.nullable().optional()
 });
 
 export const teacherUpdateSchema = z.object({
-  departmentId: z.string().nullable().optional(),
+  departmentId: objectId.nullable().optional(),
 });
 
 /* -----------------------------
    ENROLLMENT SCHEMA
 ----------------------------- */
 export const enrollSchema = z.object({
-  studentId: z.string().min(1, "Student ID required"),
-  courseId: z.string().min(1, "Course ID required"),
+  studentId: objectId,
+  courseId: objectId,
 });
 
 export const gradeSchema = z.object({
-  grade: z.string().min(1, "Grade is required"),
+  grade: z.enum(VALID_GRADES),
 });
 
 /* -----------------------------
