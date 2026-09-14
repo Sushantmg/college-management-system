@@ -8,6 +8,7 @@ import {
   UserCog,
   LogOut,
   Menu,
+  UserCircle,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -88,6 +89,21 @@ export default function Layout({ children }: { children: ReactNode }) {
                 </Link>
               );
             })}
+
+            <div className="pt-4 mt-4 border-t border-gray-200">
+              <Link
+                to="/profile"
+                onClick={() => setSidebarOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  location.pathname === "/profile"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`}
+              >
+                <UserCircle className="w-5 h-5" />
+                Profile
+              </Link>
+            </div>
           </nav>
 
           <div className="p-4 border-t border-gray-200">
