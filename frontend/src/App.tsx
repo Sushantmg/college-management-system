@@ -13,6 +13,7 @@ import TeacherCourses from "./pages/teacher/TeacherCourses";
 import TeacherStudents from "./pages/teacher/TeacherStudents";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import StudentCourses from "./pages/student/StudentCourses";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
@@ -79,6 +80,9 @@ function AppRoutes() {
       {/* Student routes */}
       <Route path="/student" element={<ProtectedRoute allowedRoles={["STUDENT"]}><StudentDashboard /></ProtectedRoute>} />
       <Route path="/student/courses" element={<ProtectedRoute allowedRoles={["STUDENT"]}><StudentCourses /></ProtectedRoute>} />
+
+      {/* Shared routes */}
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
       {/* Default redirect */}
       <Route path="/" element={<Navigate to="/login" replace />} />
