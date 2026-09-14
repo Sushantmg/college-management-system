@@ -10,6 +10,7 @@ export const createCourse = async (data: {
   return prisma.course.create({
     data: {
       ...data,
+      code: data.code.trim().toUpperCase(),
       description: data.description ?? null,
       teacherId: data.teacherId ?? null
     },
@@ -81,6 +82,7 @@ export const updateCourse = async (
     where: { id },
     data: {
       ...data,
+      code: data.code ? data.code.trim().toUpperCase() : undefined,
       description: data.description ?? undefined,
       teacherId: data.teacherId ?? undefined,
     },
