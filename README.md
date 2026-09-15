@@ -452,6 +452,8 @@ college-management-system/
 │       │   ├── Login.tsx         # Sign in page
 │       │   ├── Register.tsx      # Sign up page
 │       │   ├── Dashboard.tsx     # Admin overview
+│       │   ├── Profile.tsx       # Account details + change password
+│       │   ├── NotFound.tsx      # 404 page
 │       │   ├── admin/            # Admin CRUD pages
 │       │   │   ├── Departments.tsx
 │       │   │   ├── Teachers.tsx
@@ -624,7 +626,11 @@ npm run seed
 | `DELETE` | `/enrollments` | Admin, Teacher | Unenroll student from course |
 | `GET` | `/enrollments/student/:id` | Any | Get student's enrolled courses |
 | `GET` | `/enrollments/course/:id` | Admin, Teacher | Get course's enrolled students |
-| `PATCH` | `/enrollments/:id/grade` | Admin, Teacher | Update grade (A+ to F) |
+| `PATCH` | `/enrollments/:id/grade` | Admin, Teacher | Update grade (valid grades: A+, A, A-, B+, B, B-, C+, C, C-, D+, D, F) |
+
+> All `id` fields and references are validated against MongoDB ObjectId format, and body
+> payloads go through Zod schema validation (graceful 400 responses instead of 500s).
+> Course codes are normalized to uppercase (e.g. `cs101` → `CS101`).
 
 ### Stats
 
