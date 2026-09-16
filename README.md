@@ -592,6 +592,7 @@ npm run seed
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | `GET` | `/teachers` | Admin, Teacher | List teachers (paginated) |
+| `GET` | `/teachers/me` | Teacher | Current teacher's profile + own courses (scoped) |
 | `GET` | `/teachers/:id` | Admin, Teacher | Get teacher with courses |
 | `POST` | `/teachers` | Admin | Create teacher |
 | `PUT` | `/teachers/:id` | Admin | Update teacher department |
