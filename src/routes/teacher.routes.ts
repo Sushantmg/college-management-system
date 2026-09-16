@@ -13,6 +13,14 @@ router.get(
   controller.listTeachers
 );
 
+// Must be registered before "/:id" so "me" isn't treated as an id.
+router.get(
+  "/me",
+  authMiddleware,
+  permit("TEACHER"),
+  controller.getMyProfile
+);
+
 router.get(
   "/:id",
   authMiddleware,
