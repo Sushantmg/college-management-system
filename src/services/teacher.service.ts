@@ -56,6 +56,29 @@ export const getTeacherById = async (id: string) => {
   });
 };
 
+// Resolve a teacher from an authenticated user's id (JWT userId). Used so
+// teachers only ever see their own profile, courses, and enrollments.
+export const getTeacherByUserId = async (userId: string) => {
+  return prisma.teacher.findUnique({
+    where: { userId },
+    include: {
+      user: true,
+      department: true,
+      courses: {
+        include: {
+          department: true,
+          _count: { select: { students: true } },
+          students: {
+            include: {
+              student: { include: { user: true } },
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
 export const createTeacher = async (data: {
   userId: string;
   departmentId?: string;
