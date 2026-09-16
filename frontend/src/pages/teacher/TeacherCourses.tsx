@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
-import { coursesApi, type Course } from "../../api/courses";
+import { teachersApi, type TeacherCourse } from "../../api/teachers";
 import { BookOpen } from "lucide-react";
 
 export default function TeacherCourses() {
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<TeacherCourse[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    coursesApi.list(1, 100).then(res => setCourses(res.data.courses)).catch(console.error).finally(() => setLoading(false));
+    teachersApi.getMe()
+      .then(res => setCourses(res.data.courses))
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -35,7 +38,7 @@ export default function TeacherCourses() {
             </div>
           ) : (
             courses.map((course) => (
-              <div key={course.id} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition">
+              <div key={course.id} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition flex flex-col">
                 <div className="flex items-start justify-between mb-3">
                   <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">{course.code}</span>
                   <span className="text-xs text-gray-500">{course._count?.students || 0} students</span>
@@ -45,6 +48,30 @@ export default function TeacherCourses() {
                 {course.description && (
                   <p className="text-sm text-gray-600 mt-2 line-clamp-2">{course.description}</p>
                 )}
+
+                <div className="mt-4 pt-4 border-t border-gray-100 flex-1">
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">
+                    Enrolled students ({course.students?.length || 0})
+                  </p>
+                  {course.students && course.students.length > 0 ? (
+                    <ul className="space-y-1.5">
+                      {course.students.map((enrollment) => (
+                        <li key={enrollment.id} className="flex items-center justify-between text-sm">
+                          <span className="text-gray-700">{enrollment.student?.user?.name}</span>
+                          {enrollment.grade ? (
+                            <span className="text-xs font-medium px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
+                              {enrollment.grade}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-gray-400">No grade</span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-gray-400">No students enrolled yet</p>
+                  )}
+                </div>
               </div>
             ))
           )}
