@@ -3,32 +3,29 @@ import Layout from "../../components/Layout";
 import StatsCard from "../../components/StatsCard";
 import Modal from "../../components/Modal";
 import { useAuth } from "../../context/AuthContext";
-import { coursesApi, type Course } from "../../api/courses";
+import { teachersApi, type TeacherProfile } from "../../api/teachers";
 import { enrollmentsApi } from "../../api/enrollments";
 import { studentsApi, type Student } from "../../api/students";
 import { BookOpen, Users, Plus } from "lucide-react";
 
 export default function TeacherDashboard() {
   const { user } = useAuth();
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [profile, setProfile] = useState<TeacherProfile | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [enrollModal, setEnrollModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<string>("");
   const [selectedStudent, setSelectedStudent] = useState<string>("");
-  const [gradeModal, setGradeModal] = useState(false);
-  const [selectedEnrollment, setSelectedEnrollment] = useState<string>("");
-  const [gradeValue, setGradeValue] = useState("");
 
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
     try {
-      const [courseRes, studentRes] = await Promise.all([
-        coursesApi.list(1, 100),
+      const [meRes, studentRes] = await Promise.all([
+        teachersApi.getMe(),
         studentsApi.list(1, 100),
       ]);
-      setCourses(courseRes.data.courses);
+      setProfile(meRes.data);
       setStudents(studentRes.data.students);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
@@ -47,30 +44,20 @@ export default function TeacherDashboard() {
     }
   };
 
-  const handleGrade = async () => {
-    if (!selectedEnrollment || !gradeValue) return;
-    try {
-      await enrollmentsApi.updateGrade(selectedEnrollment, gradeValue);
-      setGradeModal(false);
-      setSelectedEnrollment("");
-      setGradeValue("");
-      loadData();
-    } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to update grade");
-    }
-  };
+  const courses = profile?.courses || [];
+  const stats = profile?.stats || { courses: 0, students: 0 };
 
   return (
     <Layout>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Teacher Dashboard</h1>
-          <p className="text-gray-500 mt-1">Welcome, {user?.name}</p>
+          <p className="text-gray-500 mt-1">Welcome, {user?.name} &middot; {profile?.department?.name || "No department"}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <StatsCard title="My Courses" value={courses.length} icon={<BookOpen className="w-6 h-6" />} color="bg-blue-500" />
-          <StatsCard title="Total Students" value={students.length} icon={<Users className="w-6 h-6" />} color="bg-green-500" />
+          <StatsCard title="My Courses" value={stats.courses} icon={<BookOpen className="w-6 h-6" />} color="bg-blue-500" />
+          <StatsCard title="My Students" value={stats.students} icon={<Users className="w-6 h-6" />} color="bg-green-500" />
         </div>
 
         <div className="flex justify-end">
@@ -127,24 +114,6 @@ export default function TeacherDashboard() {
           <div className="flex justify-end gap-3 pt-2">
             <button onClick={() => setEnrollModal(false)} className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
             <button onClick={handleEnroll} className="px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700">Enroll</button>
-          </div>
-        </div>
-      </Modal>
-
-      <Modal open={gradeModal} onClose={() => setGradeModal(false)} title="Update Grade">
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Grade</label>
-            <select value={gradeValue} onChange={(e) => setGradeValue(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white">
-              <option value="">Select grade</option>
-              {["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "F"].map(g => (
-                <option key={g} value={g}>{g}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button onClick={() => setGradeModal(false)} className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
-            <button onClick={handleGrade} className="px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700">Update</button>
           </div>
         </div>
       </Modal>
