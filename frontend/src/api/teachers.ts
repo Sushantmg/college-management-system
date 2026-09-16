@@ -12,6 +12,30 @@ export interface Teacher {
   updatedAt: string;
 }
 
+export interface TeacherEnrollment {
+  id: string;
+  grade?: string;
+  student: { id: string; user: { id: string; name: string; email: string } };
+}
+
+export interface TeacherCourse {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  department?: { id: string; name: string };
+  students?: TeacherEnrollment[];
+  _count?: { students: number };
+}
+
+export interface TeacherProfile extends Teacher {
+  courses: TeacherCourse[];
+  stats: {
+    courses: number;
+    students: number;
+  };
+}
+
 export interface PaginatedResponse {
   pagination: { page: number; limit: number; total: number; pages: number };
 }
@@ -21,6 +45,9 @@ export const teachersApi = {
     api.get<{ teachers: Teacher[] } & PaginatedResponse>("/teachers", {
       params: { page, limit, search },
     }),
+
+  // Profile + courses for the currently authenticated teacher.
+  getMe: () => api.get<TeacherProfile>("/teachers/me"),
 
   get: (id: string) => api.get<Teacher>(`/teachers/${id}`),
 
