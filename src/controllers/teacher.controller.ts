@@ -1,5 +1,40 @@
 import { Request, Response } from "express";
 import * as teacherService from "../services/teacher.service";
+import { RequestWithUser } from "../types/global-types";
+
+// Returns the teacher profile tied to the authenticated user, plus a couple
+// of precomputed stats (own courses, distinct enrolled students).
+export const getMyProfile = async (req: Request, res: Response) => {
+  const userId = (req as RequestWithUser).user?.userId;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  try {
+    const teacher = await teacherService.getTeacherByUserId(userId);
+
+    if (!teacher) {
+      res.status(404).json({ error: "Teacher profile not found" });
+      return;
+    }
+
+    const uniqueStudentIds = new Set<string>();
+    teacher.courses.forEach((course) =>
+      course.students.forEach((enrollment) => uniqueStudentIds.add(enrollment.studentId))
+    );
+
+    res.json({
+      ...teacher,
+      stats: {
+        courses: teacher.courses.length,
+        students: uniqueStudentIds.size,
+      },
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 export const listTeachers = async (req: Request, res: Response) => {
   try {
