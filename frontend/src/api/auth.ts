@@ -18,6 +18,30 @@ export interface PaginatedResponse {
   };
 }
 
+export interface StudentEnrollment {
+  id: string;
+  grade?: string | null;
+  course: {
+    id: string;
+    name: string;
+    code: string;
+    description?: string | null;
+    department?: { id: string; name: string };
+    teacher?: { user: { id: string; name: string } };
+  };
+}
+
+export interface MeResponse extends User {
+  student?: {
+    department?: { id: string; name: string };
+    courses: StudentEnrollment[];
+  };
+  teacher?: {
+    department?: { id: string; name: string };
+    courses: { id: string; name: string; code: string }[];
+  };
+}
+
 export const authApi = {
   login: (email: string, password: string) =>
     api.post<{ token: string; user: User }>("/auth/login", { email, password }),
@@ -25,7 +49,7 @@ export const authApi = {
   register: (data: { name: string; email: string; password: string; role?: string }) =>
     api.post<{ token: string; user: User }>("/auth/register", data),
 
-  getMe: () => api.get<User>("/auth/me"),
+  getMe: () => api.get<MeResponse>("/auth/me"),
 
   changePassword: (oldPassword: string, newPassword: string) =>
     api.post("/auth/change-password", { oldPassword, newPassword }),
