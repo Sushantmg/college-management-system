@@ -8,12 +8,14 @@ import {
   GraduationCap,
   BookOpen,
   UserCheck,
+  BarChart3,
 } from "lucide-react";
 import { departmentsApi, type Department } from "../api/departments";
 import { coursesApi, type Course } from "../api/courses";
 import {
   statsApi,
   type RecentEnrollment,
+  type DepartmentCounts,
 } from "../api/stats";
 
 export default function Dashboard() {
@@ -28,6 +30,7 @@ export default function Dashboard() {
   const [recentDepartments, setRecentDepartments] = useState<Department[]>([]);
   const [recentCourses, setRecentCourses] = useState<Course[]>([]);
   const [recentEnrollments, setRecentEnrollments] = useState<RecentEnrollment[]>([]);
+  const [byDepartment, setByDepartment] = useState<DepartmentCounts[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,7 +45,7 @@ export default function Dashboard() {
         coursesApi.list(1, 5),
       ]);
 
-      const { counts, recentEnrollments } = statsRes.data;
+      const { counts, recentEnrollments, byDepartment: deptBreakdown } = statsRes.data;
 
       setStats({
         departments: counts.departments,
@@ -54,12 +57,15 @@ export default function Dashboard() {
       setRecentDepartments(deptRes.data.departments);
       setRecentCourses(courseRes.data.courses);
       setRecentEnrollments(recentEnrollments);
+      setByDepartment(deptBreakdown || []);
     } catch (err) {
       console.error("Failed to load dashboard", err);
     } finally {
       setLoading(false);
     }
   };
+
+  const maxStudents = Math.max(...byDepartment.map((d) => d.students), 1);
 
   return (
     <Layout>
@@ -148,6 +154,37 @@ export default function Dashboard() {
                 <div className="px-6 py-8 text-center text-gray-500">No courses yet</div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Students by Department */}
+        <div className="bg-white rounded-xl border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-indigo-500" />
+              Students by Department
+            </h2>
+          </div>
+          <div className="p-6 space-y-4">
+            {byDepartment.map((dept) => (
+              <div key={dept.id}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-sm font-medium text-gray-700">{dept.name}</span>
+                  <span className="text-sm text-gray-500">
+                    {dept.students} students &middot; {dept.courses} courses
+                  </span>
+                </div>
+                <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-indigo-500 rounded-full transition-all"
+                    style={{ width: `${Math.round((dept.students / maxStudents) * 100)}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+            {byDepartment.length === 0 && (
+              <div className="py-2 text-center text-gray-500">No department data yet</div>
+            )}
           </div>
         </div>
 
