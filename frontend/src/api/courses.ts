@@ -1,4 +1,5 @@
 import api from "./client";
+import type { TeacherEnrollment } from "./teachers";
 
 export interface Course {
   id: string;
@@ -9,7 +10,7 @@ export interface Course {
   department?: { id: string; name: string };
   teacherId?: string;
   teacher?: { id: string; user: { name: string; email: string } };
-  students?: any[];
+  students?: TeacherEnrollment[];
   _count?: { students: number };
   createdAt: string;
   updatedAt: string;
