@@ -5,9 +5,9 @@ export interface Department {
   name: string;
   headId?: string;
   head?: { id: string; user: { name: string; email: string } };
-  teachers?: any[];
-  courses?: any[];
-  students?: any[];
+  teachers?: { id: string; user: { id: string; name: string; email: string } }[];
+  courses?: { id: string; name: string; code: string }[];
+  students?: { id: string; user: { id: string; name: string; email: string } }[];
   _count?: { teachers: number; students: number; courses: number };
   createdAt: string;
   updatedAt: string;
