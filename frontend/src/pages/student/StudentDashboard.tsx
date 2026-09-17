@@ -2,21 +2,13 @@ import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import StatsCard from "../../components/StatsCard";
 import { useAuth } from "../../context/AuthContext";
-import { authApi } from "../../api/auth";
+import { authApi, type StudentEnrollment } from "../../api/auth";
 import { BookOpen, Award, Calendar } from "lucide-react";
 
 interface StudentProfile {
   id: string;
   department?: { name: string };
-  courses: {
-    id: string;
-    grade?: string;
-    course: {
-      name: string;
-      code: string;
-      teacher?: { user: { name: string } };
-    };
-  }[];
+  courses: StudentEnrollment[];
 }
 
 export default function StudentDashboard() {
@@ -26,7 +18,14 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     authApi.getMe().then(res => {
-      setProfile(res.data as any);
+      const student = res.data.student;
+      if (student) {
+        setProfile({
+          id: res.data.id,
+          department: student.department,
+          courses: student.courses,
+        });
+      }
     }).catch(console.error).finally(() => setLoading(false));
   }, []);
 
