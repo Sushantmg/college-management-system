@@ -1,28 +1,15 @@
 import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
-import { authApi } from "../../api/auth";
+import { authApi, type StudentEnrollment } from "../../api/auth";
 import { BookOpen } from "lucide-react";
 
-interface Enrollment {
-  id: string;
-  grade?: string;
-  course: {
-    name: string;
-    code: string;
-    description?: string;
-    department?: { name: string };
-    teacher?: { user: { name: string } };
-  };
-}
-
 export default function StudentCourses() {
-  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [enrollments, setEnrollments] = useState<StudentEnrollment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     authApi.getMe().then(res => {
-      const profile = res.data as any;
-      setEnrollments(profile?.student?.courses || []);
+      setEnrollments(res.data.student?.courses || []);
     }).catch(console.error).finally(() => setLoading(false));
   }, []);
 
