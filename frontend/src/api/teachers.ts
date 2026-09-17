@@ -6,7 +6,7 @@ export interface Teacher {
   user: { id: string; name: string; email: string; role: string };
   departmentId?: string;
   department?: { id: string; name: string };
-  courses?: any[];
+  courses?: TeacherCourse[];
   _count?: { courses: number };
   createdAt: string;
   updatedAt: string;
