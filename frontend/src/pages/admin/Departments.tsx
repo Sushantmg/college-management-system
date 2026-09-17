@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import Modal from "../../components/Modal";
 import { departmentsApi, type Department } from "../../api/departments";
+import { useToast } from "../../context/ToastContext";
 import { Plus, Pencil, Trash2, Search, Building2 } from "lucide-react";
 
 export default function Departments() {
@@ -13,6 +14,8 @@ export default function Departments() {
   const [editing, setEditing] = useState<Department | null>(null);
   const [form, setForm] = useState({ name: "" });
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState<Department | null>(null);
+  const toast = useToast();
 
   useEffect(() => { loadDepartments(); }, [pagination.page]);
 
@@ -45,19 +48,23 @@ export default function Departments() {
         await departmentsApi.create(form);
       }
       setModalOpen(false);
+      toast.success(editing ? "Department updated" : "Department created");
       loadDepartments();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to save");
+      toast.error(err.response?.data?.error || "Failed to save");
     } finally { setSaving(false); }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this department?")) return;
+  const handleDelete = async () => {
+    if (!deleting) return;
     try {
-      await departmentsApi.delete(id);
+      await departmentsApi.delete(deleting.id);
+      toast.success("Department deleted");
       loadDepartments();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to delete");
+      toast.error(err.response?.data?.error || "Failed to delete");
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -125,7 +132,7 @@ export default function Departments() {
                           <button onClick={() => openEdit(dept)} className="p-1.5 hover:bg-gray-100 rounded-lg">
                             <Pencil className="w-4 h-4 text-gray-500" />
                           </button>
-                          <button onClick={() => handleDelete(dept.id)} className="p-1.5 hover:bg-red-50 rounded-lg">
+                          <button onClick={() => setDeleting(dept)} className="p-1.5 hover:bg-red-50 rounded-lg">
                             <Trash2 className="w-4 h-4 text-red-500" />
                           </button>
                         </div>
@@ -183,6 +190,17 @@ export default function Departments() {
             </button>
           </div>
         </form>
+      </Modal>
+
+      <Modal open={!!deleting} onClose={() => setDeleting(null)} title="Delete Department">
+        <p className="text-sm text-gray-600">
+          Are you sure you want to delete <span className="font-medium text-gray-900">"{deleting?.name}"</span>?
+          This will also remove related teachers, students, and courses.
+        </p>
+        <div className="flex justify-end gap-3 mt-6">
+          <button onClick={() => setDeleting(null)} className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+          <button onClick={handleDelete} className="px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700">Delete</button>
+        </div>
       </Modal>
     </Layout>
   );
