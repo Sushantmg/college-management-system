@@ -6,10 +6,12 @@ import { useAuth } from "../../context/AuthContext";
 import { teachersApi, type TeacherProfile } from "../../api/teachers";
 import { enrollmentsApi } from "../../api/enrollments";
 import { studentsApi, type Student } from "../../api/students";
+import { useToast } from "../../context/ToastContext";
 import { BookOpen, Users, Plus } from "lucide-react";
 
 export default function TeacherDashboard() {
   const { user } = useAuth();
+  const toast = useToast();
   const [profile, setProfile] = useState<TeacherProfile | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,9 +40,10 @@ export default function TeacherDashboard() {
       setEnrollModal(false);
       setSelectedCourse("");
       setSelectedStudent("");
+      toast.success("Student enrolled");
       loadData();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to enroll");
+      toast.error(err.response?.data?.error || "Failed to enroll");
     }
   };
 
