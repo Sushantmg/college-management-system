@@ -1,4 +1,5 @@
 import api from "./client";
+import type { StudentEnrollment } from "./auth";
 
 export interface Student {
   id: string;
@@ -6,7 +7,7 @@ export interface Student {
   user: { id: string; name: string; email: string; role: string };
   departmentId?: string;
   department?: { id: string; name: string };
-  courses?: any[];
+  courses?: StudentEnrollment[];
   _count?: { courses: number };
   createdAt: string;
   updatedAt: string;
