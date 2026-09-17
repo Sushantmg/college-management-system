@@ -4,6 +4,7 @@ import Modal from "../../components/Modal";
 import { coursesApi, type Course } from "../../api/courses";
 import { departmentsApi, type Department } from "../../api/departments";
 import { teachersApi, type Teacher } from "../../api/teachers";
+import { useToast } from "../../context/ToastContext";
 import { Plus, Pencil, Trash2, Search, BookOpen } from "lucide-react";
 
 export default function Courses() {
@@ -17,6 +18,8 @@ export default function Courses() {
   const [editing, setEditing] = useState<Course | null>(null);
   const [form, setForm] = useState({ name: "", code: "", description: "", departmentId: "", teacherId: "" });
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState<Course | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     loadCourses();
@@ -80,19 +83,23 @@ export default function Courses() {
         });
       }
       setModalOpen(false);
+      toast.success(editing ? "Course updated" : "Course created");
       loadCourses();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to save");
+      toast.error(err.response?.data?.error || "Failed to save");
     } finally { setSaving(false); }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this course?")) return;
+  const handleDelete = async () => {
+    if (!deleting) return;
     try {
-      await coursesApi.delete(id);
+      await coursesApi.delete(deleting.id);
+      toast.success("Course deleted");
       loadCourses();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to delete");
+      toast.error(err.response?.data?.error || "Failed to delete");
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -153,7 +160,7 @@ export default function Courses() {
                           <button onClick={() => openEdit(course)} className="p-1.5 hover:bg-gray-100 rounded-lg">
                             <Pencil className="w-4 h-4 text-gray-500" />
                           </button>
-                          <button onClick={() => handleDelete(course.id)} className="p-1.5 hover:bg-red-50 rounded-lg">
+                          <button onClick={() => setDeleting(course)} className="p-1.5 hover:bg-red-50 rounded-lg">
                             <Trash2 className="w-4 h-4 text-red-500" />
                           </button>
                         </div>
@@ -214,6 +221,17 @@ export default function Courses() {
             </button>
           </div>
         </form>
+      </Modal>
+
+      <Modal open={!!deleting} onClose={() => setDeleting(null)} title="Delete Course">
+        <p className="text-sm text-gray-600">
+          Are you sure you want to delete <span className="font-medium text-gray-900">"{deleting?.name}"</span>?
+          Student enrollments in this course will also be removed.
+        </p>
+        <div className="flex justify-end gap-3 mt-6">
+          <button onClick={() => setDeleting(null)} className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+          <button onClick={handleDelete} className="px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700">Delete</button>
+        </div>
       </Modal>
     </Layout>
   );
