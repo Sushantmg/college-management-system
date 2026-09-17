@@ -10,5 +10,5 @@
     "skipLibCheck": true
   },
   "include": ["src"],
-  "exclude": ["prisma.config.ts", "node_modules", "dist"]
+  "exclude": ["prisma.config.ts", "vitest.config.mts", "src/**/*.test.ts", "node_modules", "dist"]
 }
