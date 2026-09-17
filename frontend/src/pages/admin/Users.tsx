@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import Modal from "../../components/Modal";
 import { authApi, type User } from "../../api/auth";
+import { useToast } from "../../context/ToastContext";
 import { Pencil, Trash2, Search, UserCog } from "lucide-react";
 
 export default function Users() {
@@ -13,6 +14,8 @@ export default function Users() {
   const [editing, setEditing] = useState<User | null>(null);
   const [form, setForm] = useState({ name: "", email: "", role: "" });
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState<User | null>(null);
+  const toast = useToast();
 
   useEffect(() => { loadUsers(); }, [pagination.page]);
 
@@ -45,19 +48,23 @@ export default function Users() {
     try {
       await authApi.updateUser(editing.id, form);
       setModalOpen(false);
+      toast.success("User updated");
       loadUsers();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to update");
+      toast.error(err.response?.data?.error || "Failed to update");
     } finally { setSaving(false); }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this user and all related data?")) return;
+  const handleDelete = async () => {
+    if (!deleting) return;
     try {
-      await authApi.deleteUser(id);
+      await authApi.deleteUser(deleting.id);
+      toast.success("User deleted");
       loadUsers();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to delete");
+      toast.error(err.response?.data?.error || "Failed to delete");
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -121,7 +128,7 @@ export default function Users() {
                           <button onClick={() => openEdit(user)} className="p-1.5 hover:bg-gray-100 rounded-lg">
                             <Pencil className="w-4 h-4 text-gray-500" />
                           </button>
-                          <button onClick={() => handleDelete(user.id)} className="p-1.5 hover:bg-red-50 rounded-lg">
+                          <button onClick={() => setDeleting(user)} className="p-1.5 hover:bg-red-50 rounded-lg">
                             <Trash2 className="w-4 h-4 text-red-500" />
                           </button>
                         </div>
@@ -172,6 +179,17 @@ export default function Users() {
             </button>
           </div>
         </form>
+      </Modal>
+
+      <Modal open={!!deleting} onClose={() => setDeleting(null)} title="Delete User">
+        <p className="text-sm text-gray-600">
+          Are you sure you want to delete <span className="font-medium text-gray-900">{deleting?.name}</span>?
+          This will permanently remove the user and all related data.
+        </p>
+        <div className="flex justify-end gap-3 mt-6">
+          <button onClick={() => setDeleting(null)} className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+          <button onClick={handleDelete} className="px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700">Delete</button>
+        </div>
       </Modal>
     </Layout>
   );
