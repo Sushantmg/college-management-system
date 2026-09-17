@@ -3,6 +3,7 @@ import Layout from "../../components/Layout";
 import Modal from "../../components/Modal";
 import { teachersApi, type Teacher } from "../../api/teachers";
 import { departmentsApi, type Department } from "../../api/departments";
+import { useToast } from "../../context/ToastContext";
 import { Pencil, Trash2, Search, Users } from "lucide-react";
 
 export default function Teachers() {
@@ -15,6 +16,8 @@ export default function Teachers() {
   const [editing, setEditing] = useState<Teacher | null>(null);
   const [form, setForm] = useState({ departmentId: "" });
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState<Teacher | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     loadTeachers();
@@ -50,19 +53,23 @@ export default function Teachers() {
     try {
       await teachersApi.update(editing.id, { departmentId: form.departmentId || undefined });
       setModalOpen(false);
+      toast.success("Teacher updated");
       loadTeachers();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to update");
+      toast.error(err.response?.data?.error || "Failed to update");
     } finally { setSaving(false); }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this teacher?")) return;
+  const handleDelete = async () => {
+    if (!deleting) return;
     try {
-      await teachersApi.delete(id);
+      await teachersApi.delete(deleting.id);
+      toast.success("Teacher deleted");
       loadTeachers();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to delete");
+      toast.error(err.response?.data?.error || "Failed to delete");
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -122,7 +129,7 @@ export default function Teachers() {
                           <button onClick={() => openEdit(teacher)} className="p-1.5 hover:bg-gray-100 rounded-lg">
                             <Pencil className="w-4 h-4 text-gray-500" />
                           </button>
-                          <button onClick={() => handleDelete(teacher.id)} className="p-1.5 hover:bg-red-50 rounded-lg">
+                          <button onClick={() => setDeleting(teacher)} className="p-1.5 hover:bg-red-50 rounded-lg">
                             <Trash2 className="w-4 h-4 text-red-500" />
                           </button>
                         </div>
@@ -168,6 +175,17 @@ export default function Teachers() {
             </button>
           </div>
         </form>
+      </Modal>
+
+      <Modal open={!!deleting} onClose={() => setDeleting(null)} title="Delete Teacher">
+        <p className="text-sm text-gray-600">
+          Are you sure you want to delete <span className="font-medium text-gray-900">{deleting?.user?.name}</span>?
+          Their assigned courses will be unassigned.
+        </p>
+        <div className="flex justify-end gap-3 mt-6">
+          <button onClick={() => setDeleting(null)} className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+          <button onClick={handleDelete} className="px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700">Delete</button>
+        </div>
       </Modal>
     </Layout>
   );
