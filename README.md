@@ -4,6 +4,20 @@ A full-stack College Management System for managing departments, teachers, stude
 
 ---
 
+## Key Features
+
+- Role-based dashboards for **Admin**, **Teacher**, and **Student** users
+- Full CRUD for departments, teachers, students, and courses with pagination + search
+- Enrollment and grade management with per-course student counts
+- JWT authentication, password hashing, and role-based route guards
+- Toast notifications for success/error feedback across the app
+- Admin dashboard with live counts and a students-by-department breakdown
+- Zod-validated API with rate limiting, Helmet headers, and CORS allow-listing
+- Integration tests (Vitest + Supertest) and a GitHub Actions CI pipeline
+- Multi-stage Docker build for the backend API
+
+---
+
 ## Live Demo
 
 | Service | URL |
@@ -422,6 +436,7 @@ college-management-system/
 │   ├── utils/schema.ts           # Zod schemas + inferred types
 │   ├── prisma-config.ts          # PrismaClient singleton
 │   ├── app.ts                    # Express app setup
+│   ├── app.test.ts               # Supertest integration tests
 │   └── server.ts                 # Entry point (in-memory DB fallback)
 │
 ├── prisma/
@@ -446,7 +461,8 @@ college-management-system/
 │       │   └── StatsCard.tsx     # Statistics card
 │       │
 │       ├── context/
-│       │   └── AuthContext.tsx   # Auth state + provider
+│       │   ├── AuthContext.tsx   # Auth state + provider
+│       │   └── ToastContext.tsx  # Toast notifications (success/error)
 │       │
 │       ├── pages/
 │       │   ├── Login.tsx         # Sign in page
@@ -473,6 +489,10 @@ college-management-system/
 │       └── index.css             # Tailwind CSS
 │
 ├── .env.example                  # Environment template
+├── .github/workflows/ci.yml      # CI pipeline
+├── .dockerignore
+├── Dockerfile                    # Backend production image
+├── vitest.config.mts             # Backend test config
 ├── .gitignore
 ├── package.json                  # Backend dependencies
 ├── tsconfig.json                 # TypeScript config
@@ -504,6 +524,10 @@ college-management-system/
 | | bcryptjs | Password hashing (10 rounds) |
 | **Database** | MongoDB | NoSQL document database |
 | | mongodb-memory-server | In-memory dev database |
+| **Testing** | Vitest 5 | Test runner |
+| | Supertest 7 | HTTP integration tests |
+| **DevOps** | GitHub Actions | CI (typecheck, tests, build) |
+| | Docker | Containerized backend image |
 
 ---
 
@@ -559,6 +583,27 @@ Open **http://localhost:4000**
 # Seed with demo departments, courses, and enrollments
 npm run seed
 ```
+
+---
+
+## Testing
+
+The backend ships with [Vitest](https://vitest.dev) + [Supertest](https://github.com/ladjs/supertest)
+integration tests that exercise the Express app over HTTP — health checks,
+validation middleware, error handling, security headers, CORS, and the JWT
+authentication/authorization middleware. No database is required to run them.
+
+```bash
+# Run the test suite once
+npm test
+
+# Type-check without emitting output
+npm run typecheck
+```
+
+The same commands run in CI on every push and pull request to `main`
+(see [`.github/workflows/ci.yml`](.github/workflows/ci.yml)); the frontend job
+runs `npm run lint` and `npm run build`.
 
 ---
 
@@ -662,6 +707,27 @@ NODE_ENV=production node dist/server.js
 > When `DATABASE_URL` is missing, the server automatically starts a temporary
 > in-memory MongoDB (development only). In production, schema push is skipped
 > at runtime — run `npx prisma db push` as part of your deploy instead.
+
+### Docker
+
+A multi-stage `Dockerfile` builds and runs the backend API. The frontend is a
+static build intended for a host such as Vercel.
+
+```bash
+# Build the image
+docker build -t college-management-api .
+
+# Run it (point it at MongoDB Atlas and set a real JWT secret)
+docker run -p 3005:3005 \
+  -e DATABASE_URL="mongodb+srv://user:pass@cluster.mongodb.net/college-management" \
+  -e JWT_SECRET="your-production-secret-key" \
+  -e CORS_ORIGIN="https://your-frontend.example.com" \
+  college-management-api
+```
+
+The image runs with `NODE_ENV=production`, so it does **not** push the schema or
+start an in-memory database at startup. The container exposes `/health` as a
+Docker `HEALTHCHECK`.
 
 ### Environment Variables
 
