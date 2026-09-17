@@ -1,0 +1,17 @@
+node_modules
+dist
+coverage
+frontend
+.github
+.git
+.env
+.env.*
+!.env.example
+*.log
+npm-debug.log*
+.DS_Store
+.vscode
+vitest.config.mts
+README.md
+Dockerfile
+.dockerignore
