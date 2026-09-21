@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
 import { execSync } from "child_process";
+import type { PrismaClient } from "@prisma/client";
+import { getErrorMessage } from "./utils/errors";
 
 dotenv.config();
 
@@ -32,14 +34,14 @@ async function ensureDatabase() {
   }
 }
 
-async function connectPrisma(prisma: any) {
+async function connectPrisma(prisma: PrismaClient) {
   while (true) {
     try {
       await prisma.$connect();
       console.log("Prisma connected to MongoDB!");
       return;
-    } catch (err: any) {
-      console.error("Prisma connection failed, retrying in 15s:", err?.message);
+    } catch (err) {
+      console.error("Prisma connection failed, retrying in 15s:", getErrorMessage(err));
       await new Promise((resolve) => setTimeout(resolve, 15000));
     }
   }
