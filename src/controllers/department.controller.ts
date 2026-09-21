@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as departmentService from "../services/department.service";
+import { getErrorMessage } from "../utils/errors";
 
 export const createDepartment = async (req: Request, res: Response) => {
   try {
@@ -8,8 +9,8 @@ export const createDepartment = async (req: Request, res: Response) => {
       message: "Department created successfully",
       department,
     });
-  } catch (err: any) {
-    res.status(400).json({ error: err.message });
+  } catch (err) {
+    res.status(400).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -20,8 +21,8 @@ export const listDepartments = async (req: Request, res: Response) => {
     const search = req.query.search as string | undefined;
     const result = await departmentService.listDepartments(page, limit, search);
     res.json(result);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  } catch (err) {
+    res.status(500).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -29,8 +30,8 @@ export const listAllDepartments = async (_req: Request, res: Response) => {
   try {
     const departments = await departmentService.listAllDepartments();
     res.json(departments);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  } catch (err) {
+    res.status(500).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -44,8 +45,8 @@ export const getDepartment = async (req: Request, res: Response) => {
     }
 
     res.json(department);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  } catch (err) {
+    res.status(500).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -59,8 +60,8 @@ export const updateDepartment = async (req: Request, res: Response) => {
       message: "Department updated successfully",
       department: updated,
     });
-  } catch (err: any) {
-    res.status(400).json({ error: err.message });
+  } catch (err) {
+    res.status(400).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -68,7 +69,7 @@ export const deleteDepartment = async (req: Request, res: Response) => {
   try {
     await departmentService.deleteDepartment(req.params.id);
     res.json({ message: "Department deleted successfully" });
-  } catch (err: any) {
-    res.status(400).json({ error: err.message });
+  } catch (err) {
+    res.status(400).json({ error: getErrorMessage(err) });
   }
 };
