@@ -3,6 +3,7 @@ import Layout from "../../components/Layout";
 import Modal from "../../components/Modal";
 import { departmentsApi, type Department } from "../../api/departments";
 import { useToast } from "../../context/ToastContext";
+import { getApiErrorMessage } from "../../utils/error";
 import { Plus, Pencil, Trash2, Search, Building2 } from "lucide-react";
 
 export default function Departments() {
@@ -50,8 +51,8 @@ export default function Departments() {
       setModalOpen(false);
       toast.success(editing ? "Department updated" : "Department created");
       loadDepartments();
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to save");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Failed to save"));
     } finally { setSaving(false); }
   };
 
@@ -61,8 +62,8 @@ export default function Departments() {
       await departmentsApi.delete(deleting.id);
       toast.success("Department deleted");
       loadDepartments();
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to delete");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Failed to delete"));
     } finally {
       setDeleting(null);
     }
