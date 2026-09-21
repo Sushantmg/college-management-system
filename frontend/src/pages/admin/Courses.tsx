@@ -5,6 +5,7 @@ import { coursesApi, type Course } from "../../api/courses";
 import { departmentsApi, type Department } from "../../api/departments";
 import { teachersApi, type Teacher } from "../../api/teachers";
 import { useToast } from "../../context/ToastContext";
+import { getApiErrorMessage } from "../../utils/error";
 import { Plus, Pencil, Trash2, Search, BookOpen } from "lucide-react";
 
 export default function Courses() {
@@ -85,8 +86,8 @@ export default function Courses() {
       setModalOpen(false);
       toast.success(editing ? "Course updated" : "Course created");
       loadCourses();
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to save");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Failed to save"));
     } finally { setSaving(false); }
   };
 
@@ -96,8 +97,8 @@ export default function Courses() {
       await coursesApi.delete(deleting.id);
       toast.success("Course deleted");
       loadCourses();
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to delete");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Failed to delete"));
     } finally {
       setDeleting(null);
     }
