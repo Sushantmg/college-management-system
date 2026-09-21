@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as teacherService from "../services/teacher.service";
 import { RequestWithUser } from "../types/global-types";
+import { getErrorMessage } from "../utils/errors";
 
 // Returns the teacher profile tied to the authenticated user, plus a couple
 // of precomputed stats (own courses, distinct enrolled students).
@@ -31,8 +32,8 @@ export const getMyProfile = async (req: Request, res: Response) => {
         students: uniqueStudentIds.size,
       },
     });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  } catch (err) {
+    res.status(500).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -43,8 +44,8 @@ export const listTeachers = async (req: Request, res: Response) => {
     const search = req.query.search as string | undefined;
     const result = await teacherService.listTeachers(page, limit, search);
     res.json(result);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  } catch (err) {
+    res.status(500).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -58,8 +59,8 @@ export const getTeacher = async (req: Request, res: Response) => {
     }
 
     res.json(teacher);
-  } catch (err: any) {
-    res.status(400).json({ error: err.message });
+  } catch (err) {
+    res.status(400).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -70,8 +71,8 @@ export const createTeacher = async (req: Request, res: Response) => {
       message: "Teacher created successfully",
       teacher,
     });
-  } catch (err: any) {
-    res.status(400).json({ error: err.message });
+  } catch (err) {
+    res.status(400).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -85,8 +86,8 @@ export const updateTeacher = async (req: Request, res: Response) => {
       message: "Teacher updated successfully",
       teacher: updated,
     });
-  } catch (err: any) {
-    res.status(400).json({ error: err.message });
+  } catch (err) {
+    res.status(400).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -94,7 +95,7 @@ export const deleteTeacher = async (req: Request, res: Response) => {
   try {
     await teacherService.deleteTeacher(req.params.id);
     res.json({ message: "Teacher deleted successfully" });
-  } catch (err: any) {
-    res.status(400).json({ error: err.message });
+  } catch (err) {
+    res.status(400).json({ error: getErrorMessage(err) });
   }
 };
