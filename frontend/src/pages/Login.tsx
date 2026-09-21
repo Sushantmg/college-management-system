@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { GraduationCap, Eye, EyeOff } from "lucide-react";
+import { getApiErrorMessage } from "../utils/error";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -22,8 +23,8 @@ export default function Login() {
       if (user.role === "ADMIN") navigate("/admin");
       else if (user.role === "TEACHER") navigate("/teacher");
       else navigate("/student");
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Login failed");
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Login failed"));
     } finally {
       setLoading(false);
     }
