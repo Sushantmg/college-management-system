@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as statsService from "../services/stats.service";
+import { getErrorMessage } from "../utils/errors";
 
 export const getStats = async (_req: Request, res: Response) => {
   try {
@@ -14,7 +15,7 @@ export const getStats = async (_req: Request, res: Response) => {
       byDepartment,
       recentEnrollments,
     });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  } catch (err) {
+    res.status(500).json({ error: getErrorMessage(err) });
   }
 };
