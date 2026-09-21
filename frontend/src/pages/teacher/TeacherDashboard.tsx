@@ -7,6 +7,7 @@ import { teachersApi, type TeacherProfile } from "../../api/teachers";
 import { enrollmentsApi } from "../../api/enrollments";
 import { studentsApi, type Student } from "../../api/students";
 import { useToast } from "../../context/ToastContext";
+import { getApiErrorMessage } from "../../utils/error";
 import { BookOpen, Users, Plus } from "lucide-react";
 
 export default function TeacherDashboard() {
@@ -42,8 +43,8 @@ export default function TeacherDashboard() {
       setSelectedStudent("");
       toast.success("Student enrolled");
       loadData();
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to enroll");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Failed to enroll"));
     }
   };
 
