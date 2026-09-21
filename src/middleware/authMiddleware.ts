@@ -14,6 +14,12 @@ const VALID_ROLES: AuthPayload["role"][] = [
   "SUPERUSER",
 ];
 
+const TOKEN_EXPIRED = "TokenExpiredError";
+
+function isTokenExpiredError(err: unknown): boolean {
+  return err instanceof Error && err.name === TOKEN_EXPIRED;
+}
+
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;
   if (!secret) {
@@ -56,8 +62,8 @@ export const authMiddleware = (
     req.user = decoded;
 
     next();
-  } catch (error: any) {
-    if (error.name === "TokenExpiredError") {
+  } catch (error) {
+    if (isTokenExpiredError(error)) {
       return res.status(401).json({
         error: "Token expired",
       });
