@@ -89,7 +89,7 @@ export const deleteDepartment = async (id: string) => {
   return prisma.department.delete({ where: { id } });
 };
 
-async function formatDepartment(dept: any) {
+async function formatDepartment<T extends { headId?: string | null }>(dept: T) {
   let head = null;
   if (dept.headId) {
     const teacher = await prisma.teacher.findUnique({
