@@ -2,6 +2,7 @@ import { useState } from "react";
 import Layout from "../components/Layout";
 import { useAuth } from "../context/AuthContext";
 import { authApi } from "../api/auth";
+import { getApiErrorMessage } from "../utils/error";
 import {
   UserCircle,
   Mail,
@@ -60,8 +61,8 @@ export default function Profile() {
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to change password");
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to change password"));
     } finally {
       setSaving(false);
     }
