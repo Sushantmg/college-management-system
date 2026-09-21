@@ -4,6 +4,7 @@ import Modal from "../../components/Modal";
 import { teachersApi, type Teacher } from "../../api/teachers";
 import { departmentsApi, type Department } from "../../api/departments";
 import { useToast } from "../../context/ToastContext";
+import { getApiErrorMessage } from "../../utils/error";
 import { Pencil, Trash2, Search, Users } from "lucide-react";
 
 export default function Teachers() {
@@ -55,8 +56,8 @@ export default function Teachers() {
       setModalOpen(false);
       toast.success("Teacher updated");
       loadTeachers();
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to update");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Failed to update"));
     } finally { setSaving(false); }
   };
 
@@ -66,8 +67,8 @@ export default function Teachers() {
       await teachersApi.delete(deleting.id);
       toast.success("Teacher deleted");
       loadTeachers();
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to delete");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Failed to delete"));
     } finally {
       setDeleting(null);
     }
