@@ -8,6 +8,7 @@ import type {
 
 import cors from "cors";
 import helmet from "helmet";
+import { getErrorMessage } from "./utils/errors";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
@@ -126,13 +127,15 @@ app.use((_req: Request, res: Response) => {
 // Global error handler
 app.use(
   (
-    err: any,
+    err: unknown,
     _req: Request,
     res: Response,
     _next: NextFunction
   ) => {
+    const error = err as { type?: string; status?: number; message?: string };
+
     // Malformed JSON bodies should be a 400, not a 500
-    if (err && (err.type === "entity.parse.failed" || err.status === 400)) {
+    if (err && (error.type === "entity.parse.failed" || error.status === 400)) {
       return res.status(400).json({
         error: "Invalid request body",
       });
@@ -143,7 +146,7 @@ app.use(
     res.status(500).json({
       error: process.env.NODE_ENV === "production"
         ? "Internal Server Error"
-        : err.message,
+        : getErrorMessage(err),
     });
   }
 );
