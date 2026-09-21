@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { GraduationCap, Eye, EyeOff } from "lucide-react";
+import { getApiErrorMessage } from "../utils/error";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -23,8 +24,8 @@ export default function Register() {
       if (user.role === "ADMIN") navigate("/admin");
       else if (user.role === "TEACHER") navigate("/teacher");
       else navigate("/student");
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Registration failed");
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Registration failed"));
     } finally {
       setLoading(false);
     }
