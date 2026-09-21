@@ -3,6 +3,7 @@ import Layout from "../../components/Layout";
 import Modal from "../../components/Modal";
 import { authApi, type User } from "../../api/auth";
 import { useToast } from "../../context/ToastContext";
+import { getApiErrorMessage } from "../../utils/error";
 import { Pencil, Trash2, Search, UserCog } from "lucide-react";
 
 export default function Users() {
@@ -50,8 +51,8 @@ export default function Users() {
       setModalOpen(false);
       toast.success("User updated");
       loadUsers();
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to update");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Failed to update"));
     } finally { setSaving(false); }
   };
 
@@ -61,8 +62,8 @@ export default function Users() {
       await authApi.deleteUser(deleting.id);
       toast.success("User deleted");
       loadUsers();
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to delete");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Failed to delete"));
     } finally {
       setDeleting(null);
     }
