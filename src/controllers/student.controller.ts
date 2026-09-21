@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as studentService from "../services/student.service";
 import { RequestWithUser } from "../types/global-types";
+import { getErrorMessage } from "../utils/errors";
 
 export const listStudents = async (req: Request, res: Response) => {
   try {
@@ -9,8 +10,8 @@ export const listStudents = async (req: Request, res: Response) => {
     const search = req.query.search as string | undefined;
     const result = await studentService.listStudents(page, limit, search);
     res.json(result);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  } catch (err) {
+    res.status(500).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -32,8 +33,8 @@ export const getStudent = async (req: Request, res: Response) => {
     }
 
     res.json(student);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  } catch (err) {
+    res.status(500).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -44,8 +45,8 @@ export const createStudent = async (req: Request, res: Response) => {
       message: "Student created successfully",
       student,
     });
-  } catch (err: any) {
-    res.status(400).json({ error: err.message });
+  } catch (err) {
+    res.status(400).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -59,8 +60,8 @@ export const updateStudent = async (req: Request, res: Response) => {
       message: "Student updated successfully",
       student,
     });
-  } catch (err: any) {
-    res.status(400).json({ error: err.message });
+  } catch (err) {
+    res.status(400).json({ error: getErrorMessage(err) });
   }
 };
 
@@ -68,7 +69,7 @@ export const deleteStudent = async (req: Request, res: Response) => {
   try {
     await studentService.deleteStudent(req.params.id);
     res.json({ message: "Student deleted successfully" });
-  } catch (err: any) {
-    res.status(400).json({ error: err.message });
+  } catch (err) {
+    res.status(400).json({ error: getErrorMessage(err) });
   }
 };
