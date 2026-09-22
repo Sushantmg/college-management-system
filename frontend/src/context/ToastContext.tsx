@@ -57,21 +57,27 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm animate-[slideIn_0.2s_ease-out] ${
-              toast.type === "success"
-                ? "bg-white border-green-200"
-                : "bg-white border-red-200"
+            className={`flex items-start gap-3 px-4 py-3 rounded-2xl shadow-xl shadow-slate-900/10 border bg-white text-sm animate-slide-in ${
+              toast.type === "success" ? "border-green-200" : "border-red-200"
             }`}
           >
-            {toast.type === "success" ? (
-              <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-            ) : (
-              <XCircle className="w-5 h-5 text-red-500 shrink-0" />
-            )}
-            <span className="flex-1 text-gray-800">{toast.message}</span>
+            <span
+              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                toast.type === "success"
+                  ? "bg-gradient-to-br from-green-400 to-emerald-500"
+                  : "bg-gradient-to-br from-rose-400 to-red-500"
+              }`}
+            >
+              {toast.type === "success" ? (
+                <CheckCircle2 className="w-4.5 h-4.5 text-white" />
+              ) : (
+                <XCircle className="w-4.5 h-4.5 text-white" />
+              )}
+            </span>
+            <span className="flex-1 text-slate-800 font-medium pt-1">{toast.message}</span>
             <button
               onClick={() => dismiss(toast.id)}
-              className="text-gray-400 hover:text-gray-600 shrink-0"
+              className="p-1 -m-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg shrink-0"
             >
               <X className="w-4 h-4" />
             </button>
