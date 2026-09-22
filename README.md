@@ -9,7 +9,7 @@ A full-stack College Management System for managing departments, teachers, stude
 - Role-based dashboards for **Admin**, **Teacher**, and **Student** users
 - Full CRUD for departments, teachers, students, and courses with pagination + search
 - Enrollment and grade management with per-course student counts
-- JWT authentication, password hashing, and role-based route guards
+- JWT authentication stored in an httpOnly cookie, password hashing, and role-based route guards
 - Toast notifications for success/error feedback across the app
 - Admin dashboard with live counts and a students-by-department breakdown
 - Zod-validated API with rate limiting, Helmet headers, and CORS allow-listing
@@ -50,7 +50,7 @@ Sign in with the [demo credentials](#demo-credentials) below.
 │  │                       │                                        │  │
 │  │  ┌────────────────────┴──────────────────────────────────┐    │  │
 │  │  │                  API Layer (Axios)                     │    │  │
-│  │  │          JWT Interceptor + Auto-Logout                 │    │  │
+│  │  │          httpOnly Cookie + Auto-Logout                 │    │  │
 │  │  └────────────────────┬──────────────────────────────────┘    │  │
 │  └───────────────────────┼───────────────────────────────────────┘  │
 │                          │                                          │
@@ -145,7 +145,7 @@ graph TB
         end
         
         subgraph AuthMiddleware["Authentication"]
-            JWT["JWT Verify<br/>Bearer Token"]
+            JWT["JWT Verify<br/>Cookie / Bearer"]
             Permit["Role Permit<br/>ADMIN/TEACHER/STUDENT"]
             Validate["Zod Validation<br/>Schema Check"]
         end
@@ -293,11 +293,12 @@ sequenceDiagram
     S->>S: bcrypt.compare(password)
     S->>S: jwt.sign({userId, role})
     S-->>E: {token, user}
-    E-->>C: 200 {token, user}
+    E->>E: Set-Cookie: token (httpOnly, SameSite)
+    E-->>C: 200 {user} + Set-Cookie
 
     Note over C,D: Authenticated Request
     C->>E: GET /courses?page=1&search=CS
-    E->>M: JWT Verify (Bearer token)
+    E->>M: JWT Verify (cookie token)
     M->>M: Role Permit (ADMIN/TEACHER/STUDENT)
     M->>E: req.user = {userId, role}
     E->>S: CourseService.listCourses(1, 20, "CS")
@@ -447,7 +448,7 @@ college-management-system/
 ├── frontend/                     # React (Vite + Tailwind CSS)
 │   └── src/
 │       ├── api/                  # Axios API client + endpoints
-│       │   ├── client.ts         # Interceptors (JWT, auto-logout)
+│       │   ├── client.ts         # Interceptors (401 auto-logout)
 │       │   ├── auth.ts           # Auth API calls
 │       │   ├── courses.ts
 │       │   ├── departments.ts
@@ -613,8 +614,9 @@ runs `npm run lint` and `npm run build`.
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| `POST` | `/auth/register` | Public | Register a STUDENT account (role assigned by admin) |
-| `POST` | `/auth/login` | Public | Login, returns JWT |
+| `POST` | `/auth/register` | Public | Register a STUDENT account, sets httpOnly auth cookie |
+| `POST` | `/auth/login` | Public | Login, sets httpOnly auth cookie |
+| `POST` | `/auth/logout` | Public | Clear the auth cookie |
 | `GET` | `/auth/me` | Any | Get current user profile |
 | `POST` | `/auth/change-password` | Any | Change password |
 | `GET` | `/auth/users` | Admin | List all users (paginated) |
