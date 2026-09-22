@@ -18,8 +18,7 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await login(email, password);
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const user = await login(email, password);
       if (user.role === "ADMIN") navigate("/admin");
       else if (user.role === "TEACHER") navigate("/teacher");
       else navigate("/student");
