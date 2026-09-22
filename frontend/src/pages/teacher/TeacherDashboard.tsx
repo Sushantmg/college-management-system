@@ -55,40 +55,40 @@ export default function TeacherDashboard() {
     <Layout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Teacher Dashboard</h1>
-          <p className="text-gray-500 mt-1">Welcome, {user?.name} &middot; {profile?.department?.name || "No department"}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">Teacher Dashboard</h1>
+          <p className="text-slate-500 mt-1">Welcome, {user?.name} &middot; {profile?.department?.name || "No department"}</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <StatsCard title="My Courses" value={stats.courses} icon={<BookOpen className="w-6 h-6" />} color="bg-blue-500" />
-          <StatsCard title="My Students" value={stats.students} icon={<Users className="w-6 h-6" />} color="bg-green-500" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in-up">
+          <StatsCard title="My Courses" value={stats.courses} icon={<BookOpen className="w-6 h-6" />} color="from-sky-500 to-blue-600" />
+          <StatsCard title="My Students" value={stats.students} icon={<Users className="w-6 h-6" />} color="from-emerald-500 to-teal-600" />
         </div>
 
         <div className="flex justify-end">
-          <button onClick={() => setEnrollModal(true)} className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition">
+          <button onClick={() => setEnrollModal(true)} className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:brightness-110 transition">
             <Plus className="w-4 h-4" />
             Enroll Student
           </button>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="font-semibold text-gray-900">My Courses</h2>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <div className="px-6 py-4 border-b border-slate-100">
+            <h2 className="font-semibold text-slate-900">My Courses</h2>
           </div>
           {loading ? (
-            <div className="p-8 text-center text-gray-500">Loading...</div>
+            <div className="p-8 text-center text-slate-500">Loading...</div>
           ) : courses.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">No courses assigned</div>
+            <div className="p-8 text-center text-slate-500">No courses assigned</div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-slate-100">
               {courses.map((course) => (
-                <div key={course.id} className="px-6 py-4">
+                <div key={course.id} className="px-6 py-4 hover:bg-indigo-50/40 transition-colors">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-gray-900">{course.name}</p>
-                      <p className="text-sm text-gray-500">{course.code} &middot; {course.department?.name}</p>
+                      <p className="font-medium text-slate-900">{course.name}</p>
+                      <p className="text-sm text-slate-500">{course.code} &middot; {course.department?.name}</p>
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-slate-500">
                       {course._count?.students || 0} students
                     </div>
                   </div>
@@ -102,22 +102,22 @@ export default function TeacherDashboard() {
       <Modal open={enrollModal} onClose={() => setEnrollModal(false)} title="Enroll Student in Course">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Course</label>
-            <select value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white">
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Course</label>
+            <select value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition">
               <option value="">Select a course</option>
               {courses.map(c => <option key={c.id} value={c.id}>{c.name} ({c.code})</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Student</label>
-            <select value={selectedStudent} onChange={(e) => setSelectedStudent(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white">
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Student</label>
+            <select value={selectedStudent} onChange={(e) => setSelectedStudent(e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition">
               <option value="">Select a student</option>
               {students.map(s => <option key={s.id} value={s.id}>{s.user?.name}</option>)}
             </select>
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <button onClick={() => setEnrollModal(false)} className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
-            <button onClick={handleEnroll} className="px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700">Enroll</button>
+            <button onClick={() => setEnrollModal(false)} className="px-4 py-2.5 border border-slate-200 rounded-xl text-slate-700 font-medium hover:bg-slate-50 transition">Cancel</button>
+            <button onClick={handleEnroll} className="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:brightness-110 transition">Enroll</button>
           </div>
         </div>
       </Modal>
