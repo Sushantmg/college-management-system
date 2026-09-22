@@ -119,4 +119,21 @@ describe("authentication middleware", () => {
     expect(res.status).toBe(403);
     expect(res.body).toEqual({ error: "Forbidden" });
   });
+
+  it("accepts a token sent in a cookie", async () => {
+    const token = jwt.sign({ userId: "abc", role: "STUDENT" }, process.env.JWT_SECRET as string);
+    const res = await API.get("/auth/users").set("Cookie", `token=${token}`);
+
+    expect(res.status).toBe(403);
+    expect(res.body).toEqual({ error: "Forbidden" });
+  });
+});
+
+describe("logout", () => {
+  it("clears the auth cookie", async () => {
+    const res = await API.post("/auth/logout");
+
+    expect(res.status).toBe(200);
+    expect(res.headers["set-cookie"]?.[0]).toContain("token=;");
+  });
 });
