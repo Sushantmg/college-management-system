@@ -109,10 +109,10 @@ export default function Courses() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Courses</h1>
-            <p className="text-gray-500 mt-1">{pagination.total} total courses</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">Courses</h1>
+            <p className="text-slate-500 mt-1">{pagination.total} total courses</p>
           </div>
-          <button onClick={openCreate} className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition">
+          <button onClick={openCreate} className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:brightness-110 transition">
             <Plus className="w-4 h-4" />
             Add Course
           </button>
@@ -120,49 +120,55 @@ export default function Courses() {
 
         <form onSubmit={handleSearch} className="flex gap-3">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search courses..." className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search courses..." className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition shadow-sm" />
           </div>
-          <button type="submit" className="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Search</button>
+          <button type="submit" className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 font-medium hover:bg-slate-50 shadow-sm transition">Search</button>
         </form>
 
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-8 text-center text-gray-500">Loading...</div>
+            <div className="p-8 text-center text-slate-500">Loading...</div>
           ) : courses.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <BookOpen className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+            <div className="p-8 text-center text-slate-500">
+              <BookOpen className="w-12 h-12 mx-auto text-slate-300 mb-3" />
               No courses found
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-slate-50/80 border-b border-slate-200">
                   <tr>
-                    <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Course</th>
-                    <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Department</th>
-                    <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Teacher</th>
-                    <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Students</th>
-                    <th className="text-right px-6 py-3 text-sm font-medium text-gray-500">Actions</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Course</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Department</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Teacher</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Students</th>
+                    <th className="text-right px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-slate-100">
                   {courses.map((course) => (
-                    <tr key={course.id} className="hover:bg-gray-50">
+                    <tr key={course.id} className="hover:bg-indigo-50/40 transition-colors">
                       <td className="px-6 py-4">
-                        <p className="font-medium text-gray-900">{course.name}</p>
-                        <p className="text-sm text-gray-500">{course.code}</p>
+                        <p className="font-medium text-slate-900">{course.name}</p>
+                        <span className="inline-block mt-0.5 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">{course.code}</span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{course.department?.name || "-"}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{course.teacher?.user?.name || "Unassigned"}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{course._count?.students || 0}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{course.department?.name || "-"}</td>
+                      <td className="px-6 py-4 text-sm">
+                        {course.teacher ? (
+                          <span className="inline-block px-2.5 py-0.5 bg-sky-50 text-sky-600 rounded-full text-xs font-medium">{course.teacher.user?.name}</span>
+                        ) : (
+                          <span className="text-sm text-slate-400">Unassigned</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{course._count?.students || 0}</td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button onClick={() => openEdit(course)} className="p-1.5 hover:bg-gray-100 rounded-lg">
-                            <Pencil className="w-4 h-4 text-gray-500" />
+                        <div className="flex items-center justify-end gap-1">
+                          <button onClick={() => openEdit(course)} className="p-2 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition">
+                            <Pencil className="w-4 h-4" />
                           </button>
-                          <button onClick={() => setDeleting(course)} className="p-1.5 hover:bg-red-50 rounded-lg">
-                            <Trash2 className="w-4 h-4 text-red-500" />
+                          <button onClick={() => setDeleting(course)} className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition">
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -174,11 +180,11 @@ export default function Courses() {
           )}
 
           {pagination.pages > 1 && (
-            <div className="flex items-center justify-between px-6 py-3 border-t border-gray-200">
-              <span className="text-sm text-gray-500">Page {pagination.page} of {pagination.pages}</span>
+            <div className="flex items-center justify-between px-6 py-3 border-t border-slate-200">
+              <span className="text-sm text-slate-500">Page {pagination.page} of {pagination.pages}</span>
               <div className="flex gap-2">
-                <button disabled={pagination.page <= 1} onClick={() => setPagination(p => ({ ...p, page: p.page - 1 }))} className="px-3 py-1 text-sm border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50">Previous</button>
-                <button disabled={pagination.page >= pagination.pages} onClick={() => setPagination(p => ({ ...p, page: p.page + 1 }))} className="px-3 py-1 text-sm border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50">Next</button>
+                <button disabled={pagination.page <= 1} onClick={() => setPagination(p => ({ ...p, page: p.page - 1 }))} className="px-3 py-1 text-sm border border-slate-200 rounded-lg disabled:opacity-50 hover:bg-slate-50 transition">Previous</button>
+                <button disabled={pagination.page >= pagination.pages} onClick={() => setPagination(p => ({ ...p, page: p.page + 1 }))} className="px-3 py-1 text-sm border border-slate-200 rounded-lg disabled:opacity-50 hover:bg-slate-50 transition">Next</button>
               </div>
             </div>
           )}
@@ -188,36 +194,36 @@ export default function Courses() {
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Edit Course" : "Create Course"}>
         <form onSubmit={handleSave} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Course Name</label>
-            <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="e.g. Introduction to Programming" />
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Course Name</label>
+            <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition" placeholder="e.g. Introduction to Programming" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Course Code</label>
-              <input type="text" required value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="CS101" />
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Course Code</label>
+              <input type="text" required value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition" placeholder="CS101" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Department</label>
-              <select required value={form.departmentId} onChange={(e) => setForm({ ...form, departmentId: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white">
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Department</label>
+              <select required value={form.departmentId} onChange={(e) => setForm({ ...form, departmentId: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition">
                 <option value="">Select...</option>
                 {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Description (optional)</label>
-            <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none" rows={2} placeholder="Course description..." />
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Description (optional)</label>
+            <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition resize-none" rows={2} placeholder="Course description..." />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Assigned Teacher (optional)</label>
-            <select value={form.teacherId} onChange={(e) => setForm({ ...form, teacherId: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white">
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Assigned Teacher (optional)</label>
+            <select value={form.teacherId} onChange={(e) => setForm({ ...form, teacherId: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition">
               <option value="">No teacher assigned</option>
               {teachers.map(t => <option key={t.id} value={t.id}>{t.user?.name}</option>)}
             </select>
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setModalOpen(false)} className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
-            <button type="submit" disabled={saving} className="px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50">
+            <button type="button" onClick={() => setModalOpen(false)} className="px-4 py-2.5 border border-slate-200 rounded-xl text-slate-700 font-medium hover:bg-slate-50 transition">Cancel</button>
+            <button type="submit" disabled={saving} className="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:brightness-110 transition disabled:opacity-50">
               {saving ? "Saving..." : editing ? "Update" : "Create"}
             </button>
           </div>
@@ -225,13 +231,13 @@ export default function Courses() {
       </Modal>
 
       <Modal open={!!deleting} onClose={() => setDeleting(null)} title="Delete Course">
-        <p className="text-sm text-gray-600">
-          Are you sure you want to delete <span className="font-medium text-gray-900">"{deleting?.name}"</span>?
+        <p className="text-sm text-slate-600">
+          Are you sure you want to delete <span className="font-medium text-slate-900">"{deleting?.name}"</span>?
           Student enrollments in this course will also be removed.
         </p>
         <div className="flex justify-end gap-3 mt-6">
-          <button onClick={() => setDeleting(null)} className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
-          <button onClick={handleDelete} className="px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700">Delete</button>
+          <button onClick={() => setDeleting(null)} className="px-4 py-2.5 border border-slate-200 rounded-xl text-slate-700 font-medium hover:bg-slate-50 transition">Cancel</button>
+          <button onClick={handleDelete} className="px-4 py-2.5 bg-gradient-to-r from-rose-600 to-red-600 text-white rounded-xl font-medium shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:brightness-110 transition">Delete</button>
         </div>
       </Modal>
     </Layout>
