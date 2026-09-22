@@ -19,8 +19,7 @@ export default function Register() {
     setError("");
     setLoading(true);
     try {
-      await register({ name, email, password });
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const user = await register({ name, email, password });
       if (user.role === "ADMIN") navigate("/admin");
       else if (user.role === "TEACHER") navigate("/teacher");
       else navigate("/student");
