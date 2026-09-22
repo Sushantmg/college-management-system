@@ -2,13 +2,17 @@ import { Request, Response } from "express";
 import { AuthService } from "../services/auth.service";
 import { RequestWithUser } from "../types/global-types";
 import { getErrorMessage } from "../utils/errors";
+import { authCookieOptions, clearAuthCookieOptions } from "../utils/authCookie";
+
+const TOKEN_COOKIE = "token";
 
 export const register = async (req: Request, res: Response) => {
   try {
     const result = await AuthService.register(req.body);
+    res.cookie(TOKEN_COOKIE, result.token, authCookieOptions());
     res.status(201).json({
       message: "Registration successful",
-      ...result,
+      user: result.user,
     });
   } catch (err) {
     if (getErrorMessage(err) === "USER_EXISTS") {
@@ -22,13 +26,19 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const result = await AuthService.login(req.body);
+    res.cookie(TOKEN_COOKIE, result.token, authCookieOptions());
     res.json({
       message: "Login successful",
-      ...result,
+      user: result.user,
     });
   } catch {
     res.status(401).json({ error: "Invalid credentials" });
   }
+};
+
+export const logout = async (_req: Request, res: Response) => {
+  res.clearCookie(TOKEN_COOKIE, clearAuthCookieOptions());
+  res.json({ message: "Logged out successfully" });
 };
 
 export const getMe = async (req: Request, res: Response) => {
