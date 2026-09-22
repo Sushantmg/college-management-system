@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
   register,
   login,
+  logout,
   getMe,
   changePassword,
   listUsers,
@@ -29,6 +30,7 @@ const router = Router();
 // PUBLIC
 router.post("/register", validate(registerSchema), register);
 router.post("/login", validate(loginSchema), login);
+router.post("/logout", logout);
 
 // PROTECTED
 router.get("/me", authMiddleware, getMe);
