@@ -4,9 +4,9 @@ import { authApi, type User } from "../api/auth";
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: { name: string; email: string; password: string; role?: string }) => Promise<void>;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<User>;
+  register: (data: { name: string; email: string; password: string; role?: string }) => Promise<User>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -16,41 +16,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
-    if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
-      authApi.getMe().then((res) => {
-        setUser(res.data);
-        localStorage.setItem("user", JSON.stringify(res.data));
-      }).catch(() => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        setUser(null);
-      }).finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
+    authApi
+      .getMe()
+      .then((res) => setUser(res.data))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
   }, []);
 
   const login = async (email: string, password: string) => {
     const res = await authApi.login(email, password);
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
     setUser(res.data.user);
+    return res.data.user;
   };
 
   const register = async (data: { name: string; email: string; password: string; role?: string }) => {
     const res = await authApi.register(data);
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
     setUser(res.data.user);
+    return res.data.user;
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
+  const logout = async () => {
+    try {
+      await authApi.logout();
+    } finally {
+      setUser(null);
+    }
   };
 
   return (
