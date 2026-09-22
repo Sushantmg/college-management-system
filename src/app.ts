@@ -8,6 +8,7 @@ import type {
 
 import cors from "cors";
 import helmet from "helmet";
+import cookieParser from "cookie-parser";
 import { getErrorMessage } from "./utils/errors";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
@@ -74,6 +75,7 @@ app.use(morgan("dev"));
 
 // Body parsing
 app.use(express.json({ limit: "10kb" }));
+app.use(cookieParser());
 
 // CORS — allow a comma-separated list of origins from CORS_ORIGIN
 const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:4000,http://localhost:5173")
