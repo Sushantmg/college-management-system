@@ -70,67 +70,74 @@ export default function Users() {
   };
 
   const roleColors: Record<string, string> = {
-    ADMIN: "bg-red-100 text-red-700",
-    TEACHER: "bg-blue-100 text-blue-700",
-    STUDENT: "bg-green-100 text-green-700",
-    STAFF: "bg-yellow-100 text-yellow-700",
-    SUPERUSER: "bg-purple-100 text-purple-700",
+    ADMIN: "bg-rose-50 text-rose-600 ring-1 ring-inset ring-rose-200",
+    TEACHER: "bg-sky-50 text-sky-600 ring-1 ring-inset ring-sky-200",
+    STUDENT: "bg-emerald-50 text-emerald-600 ring-1 ring-inset ring-emerald-200",
+    STAFF: "bg-amber-50 text-amber-600 ring-1 ring-inset ring-amber-200",
+    SUPERUSER: "bg-violet-50 text-violet-600 ring-1 ring-inset ring-violet-200",
   };
 
   return (
     <Layout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-500 mt-1">{pagination.total} total users</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">User Management</h1>
+          <p className="text-slate-500 mt-1">{pagination.total} total users</p>
         </div>
 
         <form onSubmit={handleSearch} className="flex gap-3">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search users..." className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search users..." className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition shadow-sm" />
           </div>
-          <button type="submit" className="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Search</button>
+          <button type="submit" className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 font-medium hover:bg-slate-50 shadow-sm transition">Search</button>
         </form>
 
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-8 text-center text-gray-500">Loading...</div>
+            <div className="p-8 text-center text-slate-500">Loading...</div>
           ) : users.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <UserCog className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+            <div className="p-8 text-center text-slate-500">
+              <UserCog className="w-12 h-12 mx-auto text-slate-300 mb-3" />
               No users found
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-slate-50/80 border-b border-slate-200">
                   <tr>
-                    <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Name</th>
-                    <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Email</th>
-                    <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Role</th>
-                    <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Joined</th>
-                    <th className="text-right px-6 py-3 text-sm font-medium text-gray-500">Actions</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Email</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Role</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Joined</th>
+                    <th className="text-right px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-slate-100">
                   {users.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium text-gray-900">{user.name}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
+                    <tr key={user.id} className="hover:bg-indigo-50/40 transition-colors">
+                      <td className="px-6 py-4 font-medium text-slate-900">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-white text-xs font-semibold flex items-center justify-center shrink-0">
+                            {user.name.charAt(0)}
+                          </div>
+                          {user.name}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{user.email}</td>
                       <td className="px-6 py-4">
-                        <span className={`inline-block text-xs px-2.5 py-0.5 rounded-full font-medium ${roleColors[user.role] || "bg-gray-100 text-gray-700"}`}>
+                        <span className={`inline-block text-xs px-2.5 py-0.5 rounded-full font-medium ${roleColors[user.role] || "bg-slate-100 text-slate-700"}`}>
                           {user.role}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">{new Date(user.createdAt).toLocaleDateString()}</td>
+                      <td className="px-6 py-4 text-sm text-slate-500">{new Date(user.createdAt).toLocaleDateString()}</td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button onClick={() => openEdit(user)} className="p-1.5 hover:bg-gray-100 rounded-lg">
-                            <Pencil className="w-4 h-4 text-gray-500" />
+                        <div className="flex items-center justify-end gap-1">
+                          <button onClick={() => openEdit(user)} className="p-2 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition">
+                            <Pencil className="w-4 h-4" />
                           </button>
-                          <button onClick={() => setDeleting(user)} className="p-1.5 hover:bg-red-50 rounded-lg">
-                            <Trash2 className="w-4 h-4 text-red-500" />
+                          <button onClick={() => setDeleting(user)} className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition">
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -142,11 +149,11 @@ export default function Users() {
           )}
 
           {pagination.pages > 1 && (
-            <div className="flex items-center justify-between px-6 py-3 border-t border-gray-200">
-              <span className="text-sm text-gray-500">Page {pagination.page} of {pagination.pages}</span>
+            <div className="flex items-center justify-between px-6 py-3 border-t border-slate-200">
+              <span className="text-sm text-slate-500">Page {pagination.page} of {pagination.pages}</span>
               <div className="flex gap-2">
-                <button disabled={pagination.page <= 1} onClick={() => setPagination(p => ({ ...p, page: p.page - 1 }))} className="px-3 py-1 text-sm border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50">Previous</button>
-                <button disabled={pagination.page >= pagination.pages} onClick={() => setPagination(p => ({ ...p, page: p.page + 1 }))} className="px-3 py-1 text-sm border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50">Next</button>
+                <button disabled={pagination.page <= 1} onClick={() => setPagination(p => ({ ...p, page: p.page - 1 }))} className="px-3 py-1 text-sm border border-slate-200 rounded-lg disabled:opacity-50 hover:bg-slate-50 transition">Previous</button>
+                <button disabled={pagination.page >= pagination.pages} onClick={() => setPagination(p => ({ ...p, page: p.page + 1 }))} className="px-3 py-1 text-sm border border-slate-200 rounded-lg disabled:opacity-50 hover:bg-slate-50 transition">Next</button>
               </div>
             </div>
           )}
@@ -156,16 +163,16 @@ export default function Users() {
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Edit User">
         <form onSubmit={handleSave} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
-            <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" />
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Name</label>
+            <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-            <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" />
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email</label>
+            <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Role</label>
-            <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white">
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Role</label>
+            <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition">
               <option value="ADMIN">Admin</option>
               <option value="TEACHER">Teacher</option>
               <option value="STUDENT">Student</option>
@@ -174,8 +181,8 @@ export default function Users() {
             </select>
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setModalOpen(false)} className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
-            <button type="submit" disabled={saving} className="px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50">
+            <button type="button" onClick={() => setModalOpen(false)} className="px-4 py-2.5 border border-slate-200 rounded-xl text-slate-700 font-medium hover:bg-slate-50 transition">Cancel</button>
+            <button type="submit" disabled={saving} className="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:brightness-110 transition disabled:opacity-50">
               {saving ? "Saving..." : "Update"}
             </button>
           </div>
@@ -183,13 +190,13 @@ export default function Users() {
       </Modal>
 
       <Modal open={!!deleting} onClose={() => setDeleting(null)} title="Delete User">
-        <p className="text-sm text-gray-600">
-          Are you sure you want to delete <span className="font-medium text-gray-900">{deleting?.name}</span>?
+        <p className="text-sm text-slate-600">
+          Are you sure you want to delete <span className="font-medium text-slate-900">{deleting?.name}</span>?
           This will permanently remove the user and all related data.
         </p>
         <div className="flex justify-end gap-3 mt-6">
-          <button onClick={() => setDeleting(null)} className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
-          <button onClick={handleDelete} className="px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700">Delete</button>
+          <button onClick={() => setDeleting(null)} className="px-4 py-2.5 border border-slate-200 rounded-xl text-slate-700 font-medium hover:bg-slate-50 transition">Cancel</button>
+          <button onClick={handleDelete} className="px-4 py-2.5 bg-gradient-to-r from-rose-600 to-red-600 text-white rounded-xl font-medium shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:brightness-110 transition">Delete</button>
         </div>
       </Modal>
     </Layout>
