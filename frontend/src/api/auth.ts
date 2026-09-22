@@ -44,10 +44,12 @@ export interface MeResponse extends User {
 
 export const authApi = {
   login: (email: string, password: string) =>
-    api.post<{ token: string; user: User }>("/auth/login", { email, password }),
+    api.post<{ user: User }>("/auth/login", { email, password }),
 
   register: (data: { name: string; email: string; password: string; role?: string }) =>
-    api.post<{ token: string; user: User }>("/auth/register", data),
+    api.post<{ user: User }>("/auth/register", data),
+
+  logout: () => api.post("/auth/logout"),
 
   getMe: () => api.get<MeResponse>("/auth/me"),
 
