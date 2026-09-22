@@ -3,7 +3,7 @@ import Layout from "../../components/Layout";
 import StatsCard from "../../components/StatsCard";
 import { useAuth } from "../../context/AuthContext";
 import { authApi, type StudentEnrollment } from "../../api/auth";
-import { BookOpen, Award, Calendar } from "lucide-react";
+import { BookOpen, Award, GraduationCap } from "lucide-react";
 
 interface StudentProfile {
   id: string;
@@ -49,55 +49,55 @@ export default function StudentDashboard() {
     <Layout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Student Dashboard</h1>
-          <p className="text-gray-500 mt-1">Welcome, {user?.name}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">Student Dashboard</h1>
+          <p className="text-slate-500 mt-1">Welcome, {user?.name}</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatsCard title="Enrolled Courses" value={enrolledCourses.length} icon={<BookOpen className="w-6 h-6" />} color="bg-blue-500" />
-          <StatsCard title="Graded Courses" value={gradedCourses.length} icon={<Award className="w-6 h-6" />} color="bg-green-500" />
-          <StatsCard title="GPA" value={averageGrade} icon={<Calendar className="w-6 h-6" />} color="bg-purple-500" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-fade-in-up">
+          <StatsCard title="Enrolled Courses" value={enrolledCourses.length} icon={<BookOpen className="w-6 h-6" />} color="from-sky-500 to-blue-600" />
+          <StatsCard title="Graded Courses" value={gradedCourses.length} icon={<Award className="w-6 h-6" />} color="from-emerald-500 to-teal-600" />
+          <StatsCard title="GPA" value={averageGrade} icon={<GraduationCap className="w-6 h-6" />} color="from-fuchsia-500 to-purple-600" />
         </div>
 
         {profile?.department && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <p className="text-sm text-gray-500">Department</p>
-            <p className="text-lg font-semibold text-gray-900">{profile.department.name}</p>
+          <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 rounded-2xl p-6 shadow-lg shadow-indigo-900/20">
+            <p className="text-sm text-slate-400">Department</p>
+            <p className="text-lg font-semibold text-white">{profile.department.name}</p>
           </div>
         )}
 
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="font-semibold text-gray-900">My Courses</h2>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <div className="px-6 py-4 border-b border-slate-100">
+            <h2 className="font-semibold text-slate-900">My Courses</h2>
           </div>
           {loading ? (
-            <div className="p-8 text-center text-gray-500">Loading...</div>
+            <div className="p-8 text-center text-slate-500">Loading...</div>
           ) : enrolledCourses.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">No courses enrolled yet</div>
+            <div className="p-8 text-center text-slate-500">No courses enrolled yet</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-slate-50/80 border-b border-slate-200">
                   <tr>
-                    <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Course</th>
-                    <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Code</th>
-                    <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Teacher</th>
-                    <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Grade</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Course</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Code</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Teacher</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Grade</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-slate-100">
                   {enrolledCourses.map((enrollment) => (
-                    <tr key={enrollment.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium text-gray-900">{enrollment.course.name}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{enrollment.course.code}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{enrollment.course.teacher?.user?.name || "TBA"}</td>
+                    <tr key={enrollment.id} className="hover:bg-indigo-50/40 transition-colors">
+                      <td className="px-6 py-4 font-medium text-slate-900">{enrollment.course.name}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{enrollment.course.code}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{enrollment.course.teacher?.user?.name || "TBA"}</td>
                       <td className="px-6 py-4">
                         {enrollment.grade ? (
-                          <span className="inline-block px-2.5 py-0.5 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                          <span className="inline-block px-2.5 py-0.5 bg-emerald-50 text-emerald-600 text-sm font-medium rounded-full ring-1 ring-inset ring-emerald-100">
                             {enrollment.grade}
                           </span>
                         ) : (
-                          <span className="text-sm text-gray-400">Pending</span>
+                          <span className="text-sm text-slate-400">Pending</span>
                         )}
                       </td>
                     </tr>
