@@ -34,14 +34,21 @@ export const authMiddleware = (
   next: NextFunction
 ) => {
   const authHeader = req.headers.authorization;
+  const cookieToken = req.cookies?.["token"] as string | undefined;
 
-  if (!authHeader?.startsWith("Bearer ")) {
+  let token: string | undefined;
+
+  if (authHeader?.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else if (cookieToken) {
+    token = cookieToken;
+  }
+
+  if (!token) {
     return res.status(401).json({
       error: "Unauthorized",
     });
   }
-
-  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(
