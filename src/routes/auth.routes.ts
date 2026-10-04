@@ -7,6 +7,7 @@ import {
   getMe,
   changePassword,
   listUsers,
+  createUser,
   updateUser,
   deleteUser,
 } from "../controllers/auth.controller";
@@ -20,6 +21,7 @@ import { validate } from "../middleware/validationMiddleware";
 
 import {
   registerSchema,
+  createUserSchema,
   loginSchema,
   changePasswordSchema,
   updateUserSchema,
@@ -38,6 +40,7 @@ router.post("/change-password", authMiddleware, validate(changePasswordSchema), 
 
 // ADMIN - User Management
 router.get("/users", authMiddleware, permit("ADMIN"), listUsers);
+router.post("/users", authMiddleware, permit("ADMIN"), validate(createUserSchema), createUser);
 router.put("/users/:id", authMiddleware, permit("ADMIN"), validate(updateUserSchema), updateUser);
 router.delete("/users/:id", authMiddleware, permit("ADMIN"), deleteUser);
 
