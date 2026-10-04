@@ -7,6 +7,7 @@ import Departments from "./pages/admin/Departments";
 import Teachers from "./pages/admin/Teachers";
 import Students from "./pages/admin/Students";
 import Courses from "./pages/admin/Courses";
+import Enrollments from "./pages/admin/Enrollments";
 import Users from "./pages/admin/Users";
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
 import TeacherCourses from "./pages/teacher/TeacherCourses";
@@ -70,6 +71,7 @@ function AppRoutes() {
       <Route path="/admin/teachers" element={<ProtectedRoute allowedRoles={["ADMIN"]}><Teachers /></ProtectedRoute>} />
       <Route path="/admin/students" element={<ProtectedRoute allowedRoles={["ADMIN"]}><Students /></ProtectedRoute>} />
       <Route path="/admin/courses" element={<ProtectedRoute allowedRoles={["ADMIN"]}><Courses /></ProtectedRoute>} />
+      <Route path="/admin/enrollments" element={<ProtectedRoute allowedRoles={["ADMIN"]}><Enrollments /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["ADMIN"]}><Users /></ProtectedRoute>} />
 
       {/* Teacher routes */}
