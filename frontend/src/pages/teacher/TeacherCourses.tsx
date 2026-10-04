@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import { teachersApi, type TeacherCourse } from "../../api/teachers";
-import { BookOpen } from "lucide-react";
+import { enrollmentsApi } from "../../api/enrollments";
+import { useToast } from "../../context/ToastContext";
+import { getApiErrorMessage } from "../../utils/error";
+import { BookOpen, Star } from "lucide-react";
+
+const GRADES = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "F"];
 
 export default function TeacherCourses() {
   const [courses, setCourses] = useState<TeacherCourse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [savingGrade, setSavingGrade] = useState<string | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     teachersApi.getMe()
@@ -13,6 +20,27 @@ export default function TeacherCourses() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
+
+  const handleGradeChange = async (enrollmentId: string, grade: string) => {
+    setSavingGrade(enrollmentId);
+    try {
+      await enrollmentsApi.updateGrade(enrollmentId, grade);
+      setCourses(prev =>
+        prev.map(course => ({
+          ...course,
+          students: course.students?.map(enr =>
+            enr.id === enrollmentId ? { ...enr, grade: grade || undefined } : enr
+          ),
+        }))
+      );
+      toast.success(grade ? `Grade set to ${grade}` : "Grade removed");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Failed to update grade"));
+      teachersApi.getMe().then(res => setCourses(res.data.courses)).catch(console.error);
+    } finally {
+      setSavingGrade(null);
+    }
+  };
 
   return (
     <Layout>
@@ -56,15 +84,20 @@ export default function TeacherCourses() {
                   {course.students && course.students.length > 0 ? (
                     <ul className="space-y-1.5">
                       {course.students.map((enrollment) => (
-                        <li key={enrollment.id} className="flex items-center justify-between text-sm">
-                          <span className="text-slate-700">{enrollment.student?.user?.name}</span>
-                          {enrollment.grade ? (
-                            <span className="text-xs font-medium px-2 py-0.5 bg-emerald-50 text-emerald-600 ring-1 ring-inset ring-emerald-100 rounded-full">
-                              {enrollment.grade}
-                            </span>
-                          ) : (
-                            <span className="text-xs text-slate-400">No grade</span>
-                          )}
+                        <li key={enrollment.id} className="flex items-center justify-between gap-3 text-sm">
+                          <span className="text-slate-700 truncate">{enrollment.student?.user?.name}</span>
+                          <span className="flex items-center gap-1.5 shrink-0">
+                            <Star className="w-3.5 h-3.5 text-amber-400" />
+                            <select
+                              value={enrollment.grade || ""}
+                              disabled={savingGrade === enrollment.id}
+                              onChange={(e) => handleGradeChange(enrollment.id, e.target.value)}
+                              className="px-2 py-1 text-xs font-medium rounded-lg border border-slate-200 bg-white text-slate-700 outline-none transition focus:ring-2 focus:ring-indigo-500/60 disabled:opacity-50"
+                            >
+                              <option value="">No grade</option>
+                              {GRADES.map(g => <option key={g} value={g}>{g}</option>)}
+                            </select>
+                          </span>
                         </li>
                       ))}
                     </ul>
