@@ -4,7 +4,7 @@ import Modal from "../../components/Modal";
 import { authApi, type User } from "../../api/auth";
 import { useToast } from "../../context/ToastContext";
 import { getApiErrorMessage } from "../../utils/error";
-import { Pencil, Trash2, Search, UserCog } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, UserCog, Eye, EyeOff } from "lucide-react";
 
 export default function Users() {
   const [users, setUsers] = useState<User[]>([]);
@@ -16,6 +16,10 @@ export default function Users() {
   const [form, setForm] = useState({ name: "", email: "", role: "" });
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<User | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createForm, setCreateForm] = useState({ name: "", email: "", password: "", role: "STUDENT" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [creating, setCreating] = useState(false);
   const toast = useToast();
 
   useEffect(() => { loadUsers(); }, [pagination.page]);
@@ -69,6 +73,32 @@ export default function Users() {
     }
   };
 
+  const openCreate = () => {
+    setCreateForm({ name: "", email: "", password: "", role: "STUDENT" });
+    setShowPassword(false);
+    setCreateOpen(true);
+  };
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (createForm.password.length < 8 || !/[A-Za-z]/.test(createForm.password) || !/\d/.test(createForm.password)) {
+      toast.error("Password must be at least 8 characters with one letter and one number");
+      return;
+    }
+    setCreating(true);
+    try {
+      await authApi.createUser(createForm);
+      setCreateOpen(false);
+      toast.success(`${createForm.role} account created`);
+      setPagination(p => ({ ...p, page: 1 }));
+      loadUsers();
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Failed to create user"));
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const roleColors: Record<string, string> = {
     ADMIN: "bg-rose-50 text-rose-600 ring-1 ring-inset ring-rose-200",
     TEACHER: "bg-sky-50 text-sky-600 ring-1 ring-inset ring-sky-200",
@@ -80,9 +110,15 @@ export default function Users() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">User Management</h1>
-          <p className="text-slate-500 mt-1">{pagination.total} total users</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">User Management</h1>
+            <p className="text-slate-500 mt-1">{pagination.total} total users</p>
+          </div>
+          <button onClick={openCreate} className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:brightness-110 transition">
+            <Plus className="w-4 h-4" />
+            Add User
+          </button>
         </div>
 
         <form onSubmit={handleSearch} className="flex gap-3">
@@ -159,6 +195,74 @@ export default function Users() {
           )}
         </div>
       </div>
+
+      <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Create User">
+        <form onSubmit={handleCreate} className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Full Name</label>
+            <input
+              type="text"
+              required
+              value={createForm.name}
+              onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition"
+              placeholder="John Doe"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email</label>
+            <input
+              type="email"
+              required
+              value={createForm.email}
+              onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition"
+              placeholder="name@college.edu"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={createForm.password}
+                onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition pr-10"
+                placeholder="Min 8 chars, 1 letter + 1 number"
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Role</label>
+            <select
+              value={createForm.role}
+              onChange={(e) => setCreateForm({ ...createForm, role: e.target.value })}
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 outline-none transition"
+            >
+              <option value="ADMIN">Admin</option>
+              <option value="TEACHER">Teacher</option>
+              <option value="STUDENT">Student</option>
+              <option value="STAFF">Staff</option>
+              <option value="SUPERUSER">Super User</option>
+            </select>
+          </div>
+          <div className="flex justify-end gap-3 pt-2">
+            <button type="button" onClick={() => setCreateOpen(false)} className="px-4 py-2.5 border border-slate-200 rounded-xl text-slate-700 font-medium hover:bg-slate-50 transition">Cancel</button>
+            <button type="submit" disabled={creating} className="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:brightness-110 transition disabled:opacity-50">
+              {creating ? "Creating..." : "Create User"}
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Edit User">
         <form onSubmit={handleSave} className="space-y-4">
