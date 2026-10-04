@@ -94,6 +94,22 @@ export const listUsers = async (req: Request, res: Response) => {
   }
 };
 
+export const createUser = async (req: Request, res: Response) => {
+  try {
+    const user = await AuthService.createUser(req.body);
+    res.status(201).json({
+      message: "User created successfully",
+      user,
+    });
+  } catch (err) {
+    if (getErrorMessage(err) === "USER_EXISTS") {
+      res.status(409).json({ error: "User already exists" });
+      return;
+    }
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const user = await AuthService.updateUser(req.params.id, req.body);
