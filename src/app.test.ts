@@ -137,3 +137,27 @@ describe("logout", () => {
     expect(res.headers["set-cookie"]?.[0]).toContain("token=;");
   });
 });
+
+describe("admin user creation", () => {
+  const adminToken = jwt.sign({ userId: "abc", role: "ADMIN" }, process.env.JWT_SECRET as string);
+
+  it("requires an admin role", async () => {
+    const studentToken = jwt.sign({ userId: "abc", role: "STUDENT" }, process.env.JWT_SECRET as string);
+    const res = await API.post("/auth/users")
+      .set("Authorization", `Bearer ${studentToken}`)
+      .send({ name: "Jane", email: "jane@college.edu", password: "password1", role: "TEACHER" });
+
+    expect(res.status).toBe(403);
+    expect(res.body).toEqual({ error: "Forbidden" });
+  });
+
+  it("rejects invalid payloads", async () => {
+    const res = await API.post("/auth/users")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send({ name: "", email: "not-an-email", role: "HACKER" });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("Validation failed");
+    expect(Array.isArray(res.body.details)).toBe(true);
+  });
+});
