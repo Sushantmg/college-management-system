@@ -2,7 +2,7 @@ import { Role } from "@prisma/client";
 import prisma from "../prisma-config";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import type { RegisterInput, LoginInput } from "../utils/schema";
+import type { RegisterInput, LoginInput, CreateUserInput } from "../utils/schema";
 
 const SALT = 10;
 const DEFAULT_JWT_EXPIRES_IN = "7d";
@@ -63,6 +63,45 @@ export class AuthService {
         email: user.email,
         role: user.role,
       },
+    };
+  }
+
+  // Admin-created accounts. The user's profile record (teacher/student) is
+  // created automatically so the account is immediately usable.
+  static async createUser(data: CreateUserInput) {
+    const { name, email, password, role } = data;
+    const normalizedEmail = normalizeEmail(email);
+
+    const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+    if (existing) {
+      throw new Error("USER_EXISTS");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, SALT);
+
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email: normalizedEmail,
+        password: hashedPassword,
+        role,
+      },
+    });
+
+    if (role === "TEACHER") {
+      await prisma.teacher.create({ data: { userId: user.id } }).catch(() => {});
+    }
+    if (role === "STUDENT") {
+      await prisma.student.create({ data: { userId: user.id } }).catch(() => {});
+    }
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
   }
 
@@ -194,7 +233,8 @@ export class AuthService {
     if (data.role) {
       updateData.role = data.role as Role;
     }
-    return prisma.user.update({
+
+    const user = await prisma.user.update({
       where: { id: userId },
       data: updateData,
       select: {
@@ -206,6 +246,35 @@ export class AuthService {
         updatedAt: true,
       },
     });
+
+    // Keep profile records in sync so role changes never leave an orphaned
+    // or missing teacher/student profile behind.
+    const finalRole = data.role || user.role;
+    if (finalRole === "TEACHER") {
+      await prisma.teacher.upsert({
+        where: { userId },
+        create: { userId },
+        update: {},
+      });
+    }
+    if (finalRole === "STUDENT") {
+      await prisma.student.upsert({
+        where: { userId },
+        create: { userId },
+        update: {},
+      });
+    }
+    if (finalRole !== "TEACHER") {
+      // When a teacher is demoted, unassign their courses first.
+      await prisma.course.updateMany({ where: { teacherId: userId }, data: { teacherId: null } });
+      await prisma.teacher.delete({ where: { userId } }).catch(() => {});
+    }
+    if (finalRole !== "STUDENT") {
+      await prisma.studentCourse.deleteMany({ where: { student: { userId } } });
+      await prisma.student.delete({ where: { userId } }).catch(() => {});
+    }
+
+    return user;
   }
 
   static async deleteUser(userId: string) {
