@@ -55,10 +55,10 @@ export const getCourseEnrollments = async (courseId: string) => {
   });
 };
 
-export const updateGrade = async (id: string, grade: string) => {
+export const updateGrade = async (id: string, grade?: string | null) => {
   return prisma.studentCourse.update({
     where: { id },
-    data: { grade },
+    data: { grade: grade || null },
     include: {
       student: { include: { user: true } },
       course: true,
@@ -66,22 +66,37 @@ export const updateGrade = async (id: string, grade: string) => {
   });
 };
 
-export const listAllEnrollments = async (page = 1, limit = 20) => {
+export const listAllEnrollments = async (page = 1, limit = 20, search?: string) => {
   const skip = (page - 1) * limit;
+
+  const where = search
+    ? {
+        OR: [
+          { student: { user: { name: { contains: search, mode: "insensitive" as const } } } },
+          { student: { user: { email: { contains: search, mode: "insensitive" as const } } } },
+          { course: { name: { contains: search, mode: "insensitive" as const } } },
+          { course: { code: { contains: search, mode: "insensitive" as const } } },
+        ],
+      }
+    : {};
 
   const [enrollments, total] = await Promise.all([
     prisma.studentCourse.findMany({
+      where,
       skip,
       take: limit,
       include: {
         student: { include: { user: true } },
         course: {
-          include: { department: true },
+          include: {
+            department: true,
+            teacher: { include: { user: true } },
+          },
         },
       },
       orderBy: { createdAt: "desc" },
     }),
-    prisma.studentCourse.count(),
+    prisma.studentCourse.count({ where }),
   ]);
 
   return {
