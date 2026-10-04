@@ -61,6 +61,9 @@ export const authApi = {
       params: { page, limit, search },
     }),
 
+  createUser: (data: { name: string; email: string; password: string; role: string }) =>
+    api.post<{ user: User }>("/auth/users", data),
+
   updateUser: (id: string, data: Partial<User>) =>
     api.put(`/auth/users/${id}`, data),
 
