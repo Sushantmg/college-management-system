@@ -6,7 +6,13 @@ export interface Enrollment {
   courseId: string;
   grade?: string;
   student?: { id: string; user: { name: string; email: string } };
-  course?: { id: string; name: string; code: string; department?: { name: string } };
+  course?: {
+    id: string;
+    name: string;
+    code: string;
+    department?: { name: string };
+    teacher?: { user: { id: string; name: string } };
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -16,9 +22,9 @@ export interface PaginatedResponse {
 }
 
 export const enrollmentsApi = {
-  list: (page = 1, limit = 20) =>
+  list: (page = 1, limit = 20, search?: string) =>
     api.get<{ enrollments: Enrollment[] } & PaginatedResponse>("/enrollments", {
-      params: { page, limit },
+      params: { page, limit, search },
     }),
 
   getStudentEnrollments: (studentId: string) =>
