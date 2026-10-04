@@ -34,6 +34,17 @@ export const registerSchema = z.object({
     .regex(passwordComplexity, "Password must contain at least one letter and one number"),
 });
 
+// Admin-created accounts may pick a role. New TEACHER / STUDENT accounts get
+// their profile record created automatically by the service.
+export const createUserSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name is too long"),
+  email: z.string().trim().email("Invalid email format").max(254),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(passwordComplexity, "Password must contain at least one letter and one number"),
+  role: z.enum(["ADMIN", "TEACHER", "STUDENT", "STAFF", "SUPERUSER"]),
+});
+
 export const loginSchema = z.object({
   email: z.string().trim().email("Invalid email"),
   password: z.string().min(6, "Password must be at least 6 characters")
@@ -117,13 +128,18 @@ export const enrollSchema = z.object({
 });
 
 export const gradeSchema = z.object({
-  grade: z.enum(VALID_GRADES),
+  grade: z
+    .enum(VALID_GRADES)
+    .or(z.literal(""))
+    .or(z.null())
+    .optional(),
 });
 
 /* -----------------------------
    INFERRED TYPES
 ----------------------------- */
 export type RegisterInput = z.infer<typeof registerSchema>;
+export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
