@@ -9,6 +9,7 @@ import {
   LogOut,
   Menu,
   UserCircle,
+  UserCheck,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -20,6 +21,7 @@ const adminLinks = [
   { to: "/admin/teachers", label: "Teachers", icon: Users },
   { to: "/admin/students", label: "Students", icon: GraduationCap },
   { to: "/admin/courses", label: "Courses", icon: BookOpen },
+  { to: "/admin/enrollments", label: "Enrollments", icon: UserCheck },
   { to: "/admin/users", label: "Users", icon: UserCog },
 ];
 
