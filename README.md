@@ -8,7 +8,8 @@ A full-stack College Management System for managing departments, teachers, stude
 
 - Role-based dashboards for **Admin**, **Teacher**, and **Student** users
 - Full CRUD for departments, teachers, students, and courses with pagination + search
-- Enrollment and grade management with per-course student counts
+- Enrollment and grade management with per-course student counts, inline grade entry for teachers, and an admin enrollments page (search, grading, unenroll)
+- Admin user provisioning: create accounts with any role (teacher/student profiles auto-created) 
 - JWT authentication stored in an httpOnly cookie, password hashing, and role-based route guards
 - Toast notifications for success/error feedback across the app
 - Admin dashboard with live counts and a students-by-department breakdown
@@ -391,6 +392,7 @@ graph LR
 | `DELETE /enrollments` | Unenroll | Unenroll | - |
 | `PATCH /enrollments/:id/grade` | Grade | Grade | - |
 | `GET /auth/users` | Read | - | - |
+| `POST /auth/users` | Create | - | - |
 | `PUT /auth/users/:id` | Update | - | - |
 | `DELETE /auth/users/:id` | Delete | - | - |
 
@@ -620,6 +622,7 @@ runs `npm run lint` and `npm run build`.
 | `GET` | `/auth/me` | Any | Get current user profile |
 | `POST` | `/auth/change-password` | Any | Change password |
 | `GET` | `/auth/users` | Admin | List all users (paginated) |
+| `POST` | `/auth/users` | Admin | Create a user with any role (teacher/student profiles auto-created) |
 | `PUT` | `/auth/users/:id` | Admin | Update user role/name/email |
 | `DELETE` | `/auth/users/:id` | Admin | Delete user + related data |
 
@@ -669,12 +672,12 @@ runs `npm run lint` and `npm run build`.
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| `GET` | `/enrollments` | Admin | List all enrollments (paginated) |
+| `GET` | `/enrollments` | Admin | List all enrollments (paginated, `?search=` filters by student or course) |
 | `POST` | `/enrollments` | Admin, Teacher | Enroll student in course |
 | `DELETE` | `/enrollments` | Admin, Teacher | Unenroll student from course |
 | `GET` | `/enrollments/student/:id` | Any | Get student's enrolled courses |
 | `GET` | `/enrollments/course/:id` | Admin, Teacher | Get course's enrolled students |
-| `PATCH` | `/enrollments/:id/grade` | Admin, Teacher | Update grade (valid grades: A+, A, A-, B+, B, B-, C+, C, C-, D+, D, F) |
+| `PATCH` | `/enrollments/:id/grade` | Admin, Teacher | Set or clear grades (valid grades: A+, A, A-, B+, B, B-, C+, C, C-, D+, D, F; send `null` to clear) |
 
 > All `id` fields and references are validated against MongoDB ObjectId format, and body
 > payloads go through Zod schema validation (graceful 400 responses instead of 500s).
