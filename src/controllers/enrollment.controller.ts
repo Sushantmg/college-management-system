@@ -68,7 +68,8 @@ export const listAllEnrollments = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
-    const result = await enrollmentService.listAllEnrollments(page, limit);
+    const search = req.query.search as string | undefined;
+    const result = await enrollmentService.listAllEnrollments(page, limit, search);
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: getErrorMessage(err) });
